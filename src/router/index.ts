@@ -4,7 +4,7 @@ export const router = createRouter({
     history: createWebHistory('/'),
     routes: [
         {
-            path: '/cidade',
+            path: '/',
             component: () => import('@/view/index-cidade.vue')
         },
         {
