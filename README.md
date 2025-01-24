@@ -4,12 +4,12 @@ Esse é um template utilizando componentes genéricos para produzir CRUD's
 
 ## Executar o projeto
 
-1 - Clone o repositório
-2 - Instale os pacotes NPM
+1 - Clone o repositório.
+2 - Instale os pacotes NPM.
 ``` sh
 npm i
 ```
-3 - Execute o projeto
+3 - Execute o projeto.
 ``` sh
 npm run dev
 ```
