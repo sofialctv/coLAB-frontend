@@ -4,7 +4,7 @@ Esse é um template utilizando componentes genéricos para produzir CRUD's
 
 ## Executar o projeto
 
-1 - Clone o repositório.
+1 - Clone o repositório. <br>
 2 - Instale os pacotes NPM.
 ``` sh
 npm i
