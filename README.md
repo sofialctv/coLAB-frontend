@@ -1,6 +1,10 @@
 # Vue CRUD Example
 
-Esse é um template utilizando componentes genéricos para produzir CRUD's
+Esse é um template utilizando componentes genéricos para produzir CRUD's.
+
+O exemplo está com Cidade!
+
+As entidades Cliente e Pedido estão antigos.
 
 ## Executar o projeto
 
