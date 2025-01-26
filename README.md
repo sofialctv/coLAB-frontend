@@ -8,7 +8,12 @@ As entidades Cliente e Pedido estão antigos.
 
 ## Executar o projeto
 
-1 - Clone o repositório. <br>
+1 - Clone o repositório e abra o projeto.
+``` sh
+git clone https://github.com/GustavoACaetano/VueCRUDExample.git
+cd vuecrudexample
+code .
+```
 2 - Instale os pacotes NPM.
 ``` sh
 npm i
