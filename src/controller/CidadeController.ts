@@ -7,7 +7,7 @@ export default class CidadeController {
     this.cidadeRepository = new CidadeRepository();
   }
 
-  async getAllCidade() {
+  async getAll() {
     return await this.cidadeRepository.fetchAllCidade();
   }
 

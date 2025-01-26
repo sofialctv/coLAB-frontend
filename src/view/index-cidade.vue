@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { useCidadeStore } from '@/controller/store/CidadeStore';
 import { Cidade, type ICidade } from '@/model/Cidade';
+import type { IField } from '@/model/generic/IField';
 import CreateForm from './generic/CreateForm.vue';
 import CreateButton from './generic/CreateButton.vue';
-import type { IField } from '@/model/generic/IField';
 import GenericTable from './generic/GenericTable.vue';
+import SearchBar from './generic/SearchBar.vue';
 
 // Estado e configuração inicial
-const cidades = ref<ICidade[]>([]);
 const header = ref([
   { title: 'Id', key: 'Id' },
   { title: 'Nome', key: 'Nome' },
@@ -34,7 +34,6 @@ onMounted(async () => {
 async function getCidades() {
   try {
     await useCidadeStore.fetch('');
-    cidades.value = useCidadeStore.items;
   } catch (error) {
     console.error('Erro ao buscar cidades:', error);
   }
@@ -54,6 +53,17 @@ async function deleteCidade(item: ICidade) {
     console.error('Erro ao excluir cidade:', error);
   }
 }
+
+// Filtro - esse filtro funciona apenas com as informacoes da pagina
+// para fazer um filtro por toda a base precisa fazer uma requisicao
+const filtro = ref('')
+function buscar(valor: string) {
+  filtro.value = valor.toLowerCase();
+}
+
+const filteredItems = computed(() => {
+  return useCidadeStore.items.filter(x => x.Nome.toLowerCase().includes(filtro.value));
+})
 </script>
 
 <template>
@@ -71,9 +81,11 @@ async function deleteCidade(item: ICidade) {
     Cadastrar Cidade
   </CreateButton>
 
+  <SearchBar title="cidade por nome" @search-items="buscar"></SearchBar>
+
   <GenericTable
     :headers="header"
-    :items="cidades"
+    :items="filteredItems"
     @edit="editCidade"
     @delete="deleteCidade"
   />

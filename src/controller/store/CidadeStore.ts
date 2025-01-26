@@ -12,5 +12,6 @@ const cidades: Cidade[] = [
     new Cidade('31773898-7570-43dd-85dd-39cfc88d6c2e', 'Serra')
 ];
 
+// if (import.meta.env.VITE_MOCK === "true") genericStore.enableMock(async () => cidades);
 genericStore.enableMock(async () => cidades);
 export const useCidadeStore = genericStore.createStore(cidadeController);
