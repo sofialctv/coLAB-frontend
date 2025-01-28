@@ -1,24 +1,16 @@
 <template>
   <v-app>
-    <Sidebar /> 
-
-    <v-app-bar app>
-      <v-toolbar-title>colab</v-toolbar-title>
-    </v-app-bar>
-
+    <Sidebar />
     <v-main>
-      <router-view></router-view>
+      <router-view /> <!-- Conteúdo dinâmico das rotas -->
     </v-main>
   </v-app>
 </template>
 
 <script>
 
-import Sidebar from './components/Sidebar';
-
-export default {
-  components: {
-    Sidebar,
-  },
-};
 </script>
+
+<style>
+/* Estilos globais podem ser adicionados aqui */
+</style>
