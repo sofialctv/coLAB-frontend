@@ -1,16 +1,23 @@
 <template>
-  <v-app>
-    <Sidebar />
-    <v-main>
-      <router-view /> <!-- Conteúdo dinâmico das rotas -->
-    </v-main>
-  </v-app>
+  <div id="app">
+    <!-- Renderiza as views correspondentes às rotas -->
+    <router-view />
+  </div>
 </template>
 
 <script>
-
+export default {
+  name: 'App'
+}
 </script>
 
 <style>
-/* Estilos globais podem ser adicionados aqui */
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
 </style>
