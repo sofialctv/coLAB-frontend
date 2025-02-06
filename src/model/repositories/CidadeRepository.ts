@@ -1,4 +1,3 @@
-// src/repositories/ProductRepository.js
 import api from '@/services/api';
 import type { ICidade } from '../Cidade';
 import { Cidade } from '../Cidade';
