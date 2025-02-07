@@ -1,7 +1,6 @@
 import api from '@/services/api';
-import type { IBolsa } from './Bolsa';
-import { Bolsa } from './Bolsa';
-import BolsaRoutes from './apiRoutes/BolsaRoutes';
+import { IBolsa, Bolsa } from '../Entities/Bolsa';
+import BolsaRoutes from './ApiRoutes/BolsaRoutes';
 
 export default class BolsaRepository {
   apiClient;
@@ -13,7 +12,7 @@ export default class BolsaRepository {
     return new BolsaRoutes({}).getAll;
   }
 
-  createDeleteRoute(id: string) {
+  createDeleteRoute(id: number) {
     return new BolsaRoutes({ id: id }).delete;
   }
 
@@ -59,7 +58,7 @@ export default class BolsaRepository {
     }
   }
 
-  async updateBolsa(Id: string, form: IBolsa) {
+  async updateBolsa(Id: number, form: IBolsa) {
     try {
       // Criar rota de conexão
       const baseRoute = this.createBaseRoute();
@@ -78,7 +77,7 @@ export default class BolsaRepository {
     }
   }
 
-  async deleteBolsa(Id: string) {
+  async deleteBolsa(Id: number) {
     try {
       // Criar rota de conexão
       const deleteRoute = this.createDeleteRoute(Id);

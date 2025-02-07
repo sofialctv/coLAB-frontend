@@ -1,23 +1,22 @@
 import api from '@/services/api';
-import type { ICargo } from '../Entities/Cargo';
-import { Cargo } from '../Entities/Cargo';
-import CargoRoutes from '../Repositories/ApiRoutes/CargoRoutes';
+import { Pessoa, IPessoa } from '../Entities/Pessoa';
+import PessoaRoutes from './ApiRoutes/PessoaRoutes';
 
-export default class CargoRepository {
+export default class PessoaRepository {
   apiClient;
   constructor() {
     this.apiClient = api;
   }
 
   createBaseRoute() {
-    return new CargoRoutes({}).getAll;
+    return new PessoaRoutes({}).getAll;
   }
 
-  createDeleteRoute(id: string) {
-    return new CargoRoutes({ id: id }).delete;
+  createDeleteRoute(id: number) {
+    return new PessoaRoutes({ id: id }).delete;
   }
 
-  async fetchAllCargo() {
+  async fetchAllPessoa() {
     try {
       // Criar rota de conexão
       const baseRoute = this.createBaseRoute();
@@ -26,20 +25,24 @@ export default class CargoRepository {
       const response = await this.apiClient.get(baseRoute);
 
       // Retorna a função com a criação de objetos
-      return response.data.value.map((cargo: ICargo) =>
-        new Cargo (
-          cargo.Id,
-          cargo.Nome,
-          cargo.Descricao
+      return response.data.value.map((pessoa: IPessoa) =>
+        new Pessoa(
+          pessoa.Id,
+          pessoa.Nome,
+          pessoa.Email,
+          pessoa.Telefone,
+          pessoa.Cpf,
+          pessoa.Bolsa,
+          pessoa.HistoricosCargo
         ));
 
     } catch (error) {
-      console.error("Erro ao buscar cargos.", error);
+      console.error("Erro ao buscar pessoas.", error);
       throw error;
     }
   }
 
-  async createCargo(form: ICargo) {
+  async createPessoa(form: IPessoa) {
     try {
       // Criar rota de conexão
       const baseRoute = this.createBaseRoute();
@@ -51,12 +54,12 @@ export default class CargoRepository {
       return response;
 
     } catch (error) {
-      console.error("Erro ao criar cargo.", error);
+      console.error("Erro ao criar pessoa.", error);
       throw error;
     }
   }
 
-  async updateCargo(Id: number, form: ICargo) {
+  async updatePessoa(Id: number, form: IPessoa) {
     try {
       // Criar rota de conexão
       const baseRoute = this.createBaseRoute();
@@ -71,12 +74,12 @@ export default class CargoRepository {
       return response;
 
     } catch (error) {
-      console.error("Erro ao atualizar cargo.", error);
+      console.error("Erro ao atualizar pessoa.", error);
       throw error;
     }
   }
 
-  async deleteCargo(Id: string) {
+  async deletePessoa(Id: number) {
     try {
       // Criar rota de conexão
       const deleteRoute = this.createDeleteRoute(Id);
@@ -88,7 +91,7 @@ export default class CargoRepository {
       return response;
 
     } catch (error) {
-      console.error("Erro ao deletar o cargo.", error);
+      console.error("Erro ao deletar a pessoa.", error);
       throw error;
     }
   }

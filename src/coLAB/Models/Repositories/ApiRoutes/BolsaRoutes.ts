@@ -1,6 +1,6 @@
 import type { BaseConfig } from "./BaseConfig";
 
-class CargoRoutes {
+class BolsaRoutes {
     protected config: BaseConfig;
     protected name: string;
 
@@ -35,4 +35,4 @@ class CargoRoutes {
     };
 };
 
-export default CargoRoutes;
+export default BolsaRoutes;
