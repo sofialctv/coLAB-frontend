@@ -1,9 +1,7 @@
-import '@mdi/font/css/materialdesignicons.css'
 import { createVuetify } from 'vuetify'
 import 'vuetify/styles'
 
-// Importando plugins específicos, como o VToast
-
+// Configuração correta dos ícones
 const vuetify = createVuetify({
   theme: {
     defaultTheme: 'light',
@@ -16,6 +14,9 @@ const vuetify = createVuetify({
         },
       },
     },
+  },
+  icons: {
+    defaultSet: 'mdi', // set de ícones do Material Design Icons
   },
 })
 
