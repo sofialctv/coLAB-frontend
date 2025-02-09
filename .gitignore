@@ -30,3 +30,8 @@ coverage
 *.tsbuildinfo
 
 package-lock.json
+/.vs/coLAB-frontend/config
+/.vs/coLAB-frontend/FileContentIndex
+*.json
+*.sqlite
+/.vs/coLAB-frontend/v17
