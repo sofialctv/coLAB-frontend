@@ -15,9 +15,7 @@ export default class PessoaRepository {
 
   async fetchPessoa_s() {
     try {
-
       const baseRoute = this.createBaseRoute();
-
       const response = await api.get(baseRoute);
 
       // Retorna a função com a criação de objetos
@@ -41,7 +39,6 @@ export default class PessoaRepository {
   async createPessoa(form: IPessoa) {
     try {
       const baseRoute = this.pessoaRoutes.post();
-
       const response = await api.post(baseRoute, form);
 
       return response; // Retorna a resposta do backend
@@ -55,7 +52,6 @@ export default class PessoaRepository {
   async updatePessoa(Id: number, form: IPessoa) {
     try {
       const baseRoute = this.pessoaRoutes.update(Id);
-
       const response = await api.put(baseRoute, form);
 
       return response;

@@ -8,7 +8,7 @@ export default class HistoricoCargoController {
   }
 
   async getAll() {
-    return await this.historicoCargoRepository.fetchAllHistoricoCargo();
+    return await this.historicoCargoRepository.fetchHistoricoCargo_s();
   }
 
   async create(form: IHistoricoCargo) {

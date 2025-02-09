@@ -8,7 +8,7 @@ export default class CargoController {
   }
 
   async getAll() {
-    return await this.cargoRepository.fetchAllCargo();
+    return await this.cargoRepository.fetchCargo_s();
   }
 
   async create(form: ICargo) {

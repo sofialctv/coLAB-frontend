@@ -1,5 +1,5 @@
-import { ICargo } from './Cargo';
-import { IPessoa } from './Pessoa';
+import type { ICargo } from './Cargo';
+import type { IPessoa } from './Pessoa';
 
 export interface IHistoricoCargo {
     Id: number;

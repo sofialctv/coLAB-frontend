@@ -1,34 +1,34 @@
 class PessoaRoutes {
-    private readonly name: string;
+  private readonly name: string;
 
-    constructor() {
-        this.name = 'pessoa';
-    };
+  constructor() {
+    this.name = 'pessoa';
+  };
 
-    // GET
-    getAll(): string {
-        return `${this.name}`;
-    };
+  // GET
+  getAll(): string {
+    return `${this.name}`;
+  };
 
-    // GET by ID
-    getById(id: number): string {
-        return `${this.name}/${id}`;
-    };
+  // GET by ID
+  getById(id: number): string {
+    return `${this.name}/${id}`;
+  };
 
-    // POST
-    post(): string {
-        return `${this.name}`;
-    };
+  // POST
+  post(): string {
+      return `${this.name}`;
+  };
 
-    // PUT
-    update(id: number): string {
-        return `${this.name}/${id}`;
-    };
+  // PUT
+  update(id: number): string {
+    return `${this.name}/${id}`;
+  };
 
-    // DELETE
-    delete(id: number): string {
-        return `${this.name}/${id}`;
-    };
+  // DELETE
+  delete(id: number): string {
+    return `${this.name}/${id}`;
+  };
 };
 
 export default PessoaRoutes;

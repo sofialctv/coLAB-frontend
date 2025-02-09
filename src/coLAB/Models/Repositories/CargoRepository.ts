@@ -1,28 +1,21 @@
-import api from '@/services/api';
-import { Cargo, ICargo } from '../Entities/Cargo';
+import api from '@/coLAB/API/api';
+import type { ICargo } from '../Entities/Cargo';
+import { Cargo } from '../Entities/Cargo';
 import CargoRoutes from '../ApiRoutes/CargoRoutes';
 
 export default class CargoRepository {
-  apiClient;
-  constructor() {
-    this.apiClient = api;
+
+  private cargoRoutes = new CargoRoutes();
+
+  // Se um ID for passado ele chama o getById, se não, chama o getAll
+  private createBaseRoute(Id?: number) : string {
+    return Id ? this.cargoRoutes.getById(Id) : this.cargoRoutes.getAll();
   }
 
-  createBaseRoute() {
-    return new CargoRoutes({}).getAll;
-  }
-
-  createDeleteRoute(id: number) {
-    return new CargoRoutes({ id: id }).delete;
-  }
-
-  async fetchAllCargo() {
+  async fetchCargo_s() {
     try {
-      // Criar rota de conexão
       const baseRoute = this.createBaseRoute();
-
-      // Faz a request usando a api com o axios
-      const response = await this.apiClient.get(baseRoute);
+      const response = await api.get(baseRoute);
 
       // Retorna a função com a criação de objetos
       return response.data.value.map((cargo: ICargo) =>
@@ -40,14 +33,10 @@ export default class CargoRepository {
 
   async createCargo(form: ICargo) {
     try {
-      // Criar rota de conexão
-      const baseRoute = this.createBaseRoute();
+      const baseRoute = this.cargoRoutes.post();
+      const response = await api.post(baseRoute, form);
 
-      // Faz o post usando a api com o axios e enviando os dados
-      const response = await this.apiClient.post(baseRoute, form);
-
-      // Retorna a resposta do backend
-      return response;
+      return response; // Retorna a resposta do backend
 
     } catch (error) {
       console.error("Erro ao criar cargo.", error);
@@ -57,16 +46,9 @@ export default class CargoRepository {
 
   async updateCargo(Id: number, form: ICargo) {
     try {
-      // Criar rota de conexão
-      const baseRoute = this.createBaseRoute();
+      const baseRoute = this.cargoRoutes.update(Id);
+      const response = await api.put(baseRoute, form);
 
-      // Garante que o Id está salvo dentro do form
-      form.Id = Id;
-
-      // Faz o put usando a api com o axios e enviando os dados
-      const response = await this.apiClient.put(baseRoute, form);
-
-      // Retorna a resposta do backend
       return response;
 
     } catch (error) {
@@ -77,13 +59,9 @@ export default class CargoRepository {
 
   async deleteCargo(Id: number) {
     try {
-      // Criar rota de conexão
-      const deleteRoute = this.createDeleteRoute(Id);
+      const baseRoute = this.cargoRoutes.delete(Id);
+      const response = await api.delete(baseRoute);
 
-      // Faz o delete usando a api com o axios e enviando os dados
-      const response = await this.apiClient.delete(deleteRoute);
-
-      // Retorna a resposta do backend
       return response;
 
     } catch (error) {

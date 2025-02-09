@@ -1,38 +1,34 @@
-import type { BaseConfig } from "./BaseConfig";
-
 class HistoricoCargoRoutes {
-    protected config: BaseConfig;
-    protected name: string;
+  private readonly name: string;
 
-    constructor(config: BaseConfig) {
-        this.config = config;
-        this.name = 'historicocargo';
-    };
+  constructor() {
+      this.name = 'historicoCargo';
+  };
 
-    // GET
-    get getAll(): string {
-        return `${this.name}`;
-    };
+  // GET
+  getAll(): string {
+    return `${this.name}`;
+  };
 
-    // GET by ID
-    get getById(): string {
-        return `${this.name}/${this.config.id}`;
-    };
+  // GET by ID
+  getById(id: number): string {
+    return `${this.name}/${id}`;
+  };
 
-    // POST
-    get post(): string {
-        return `${this.name}`;
-    };
+  // POST
+  post(): string {
+    return `${this.name}`;
+  };
 
-    // PUT
-    get update(): string {
-        return `${this.name}/${this.config.id}`;
-    };
+  // PUT
+  update(id: number): string {
+    return `${this.name}/${id}`;
+  };
 
-    // DELETE
-    get delete(): string {
-        return `${this.name}/${this.config.id}`;
-    };
+  // DELETE
+  delete(id: number): string {
+    return `${this.name}/${id}`;
+  };
 };
 
 export default HistoricoCargoRoutes;
