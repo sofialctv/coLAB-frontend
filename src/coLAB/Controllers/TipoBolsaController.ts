@@ -1,4 +1,4 @@
-import { ITipoBolsa} from '../Models/Entities/TipoBolsa';
+import type { ITipoBolsa } from '../Models/Entities/TipoBolsa';
 import TipoBolsaRepository from '../Models/Repositories/TipoBolsaRepository';
 
 export default class PessoaController {

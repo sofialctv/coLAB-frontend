@@ -5,7 +5,7 @@ import type { IBolsa } from '../Models/Entities/Bolsa';
 import { Bolsa } from '../Models/Entities/Bolsa';
 import GenericSnackbar from '@/view/generic/GenericSnackbar.vue';
 import PessoaController from '../Controllers/PessoaController';
-import TipoBolsaController from '../Controllers/PessoaController';
+import TipoBolsaController from '../Controllers/TipoBolsaController';
 import ProjetoController from '../Controllers/ProjetoController';
 
 const tiposBolsa = ref([]); // Lista de tipos de bolsa existentes
@@ -15,7 +15,7 @@ const isNovoTipoBolsa = ref(false); // Flag para exibir o campo de novo tipo
 // Função para carregar os tipos de bolsa
 const carregarTiposBolsa = async () => {
   // Supondo que você tenha um controller para gerenciar os tipos de bolsa
-  tiposBolsa.value = await tipoBolsaController.getAll();
+  tiposBolsa.value = await TipoBolsaController.getAll();
 };
 
 // Função para verificar se é novo tipo de bolsa
@@ -78,7 +78,7 @@ const projetos = ref<IProjeto[]>([]);
 // Estado do modal e bolsa editável
 const dialog = ref(false);
 const bolsaSelecionada = ref<IBolsa>(
-  new Bolsa(0, 0, new Date(), new Date(), new Date(), true, null, null, null)
+  new Bolsa(0, 0, new Date(), new Date(), true, null, null, null, new Date())
 );
 
 // Carregar dados ao iniciar
@@ -102,9 +102,10 @@ onMounted(() => {
 
 // Abrir modal para adicionar nova bolsa
 const abrirNovaBolsa = () => {
-  bolsaSelecionada.value = new Bolsa(0, 0, new Date(), new Date(), new Date(), true, null, null);
+  bolsaSelecionada.value = new Bolsa(0, 0, new Date(), new Date(), true, null, null, null, new Date());
   dialog.value = true;
 };
+
 
 const formatarDataParaISO = (dataString: string | Date) => {
   const data = new Date(dataString);
@@ -182,7 +183,7 @@ const excluirBolsa = async (Id: number) => {
       <!-- Tabela de Bolsas -->
       <v-data-table
         :headers="[
-          { title: 'TipoBolsa', key: 'TipoBolsa' },
+          { title: 'TipoBolsa', key: 'TipoBolsaNome' },
           { title: 'Pessoa', key: 'PessoaNome' },
           { title: 'Projeto', key: 'ProjetoNome' },
           { title: 'DataInicio', key: 'DataInicio' },
@@ -196,11 +197,11 @@ const excluirBolsa = async (Id: number) => {
       >
         <template v-slot:item="{ item }">
           <tr>
-            <td>  {{ item.TipoBolsa }}  </td>
+            <td>  {{ item.TipoBolsaNome }}  </td>
             <td>  {{ item.PessoaNome }} </td>
             <td>  {{ item.ProjetoNome }}  </td>
             <td>  {{ item.DataInicio }} </td>
-            <td>  {{ item.DataFim }}  </td>
+            <td>  {{ item.DataFim ? item.DataFim : '-' }} </td>
             <td>  {{ item.DataPrevistaFim }}  </td>
             <td>  {{ item.Ativo ? 'Sim' : 'Não' }}  </td>
             <td style="display: flex; gap: 0.5rem; align-items: center;">

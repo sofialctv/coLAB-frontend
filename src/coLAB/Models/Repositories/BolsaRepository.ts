@@ -1,5 +1,6 @@
 import api from '@/services/api';
-import { IBolsa, Bolsa } from '../Entities/Bolsa';
+import type { IBolsa } from '../Entities/Bolsa';
+import { Bolsa } from '../Entities/Bolsa';
 import BolsaRoutes from './ApiRoutes/BolsaRoutes';
 
 export default class BolsaRepository {
@@ -25,17 +26,20 @@ export default class BolsaRepository {
       const response = await this.apiClient.get(baseRoute);
 
       // Retorna a função com a criação de objetos
-      return response.data.value.map((bolsa: IBolsa) =>
+      return response.data.value.map((bolsa: any) =>
         new Bolsa(
           bolsa.Id,
           bolsa.Valor,
           bolsa.DataInicio,
-          bolsa.DataFim,
           bolsa.DataPrevistaFim,
           bolsa.Ativo,
-          bolsa.TipoBolsa,
-          bolsa.Pessoa,
-          Bolsa.Projeto
+          bolsa.TipoBolsaId,
+          bolsa.TipoBolsaNome,
+          bolsa.PessoaId,
+          bolsa.PessoaNome,
+          bolsa.ProjetoId,
+          bolsa.ProjetoNome,
+          bolsa.DataFim ? new Date(bolsa.DataFim) : undefined
         ));
     } catch (error) {
       console.error("Erro ao buscar bolsas.", error);
