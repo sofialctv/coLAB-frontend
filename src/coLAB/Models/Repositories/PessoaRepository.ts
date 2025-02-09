@@ -1,28 +1,24 @@
-import api from '@/services/api';
+import api from '@/coLAB/API/api';
 import type { IPessoa } from '../Entities/Pessoa';
 import { Pessoa } from '../Entities/Pessoa';
-import PessoaRoutes from './ApiRoutes/PessoaRoutes';
+import PessoaRoutes from '../ApiRoutes/PessoaRoutes';
 import type { IHistoricoCargo } from '../Entities/HistoricoCargo';
 
 export default class PessoaRepository {
 
-  private pessoaRoutes = new PessoaRoutes({});
+  private pessoaRoutes = new PessoaRoutes();
 
-  createBaseRoute(Id?: number) : string {
-    return Id ? `${this.pessoaRoutes.getAll}/${Id}` : baseRoute;
+  // Se um ID for passado ele chama o getById, se não, chama o getAll
+  private createBaseRoute(Id?: number) : string {
+    return Id ? this.pessoaRoutes.getById(Id) : this.pessoaRoutes.getAll();
   }
 
-  createDeleteRoute(id: number) {
-    return new PessoaRoutes({ id: id }).delete;
-  }
-
-  async fetchAllPessoa() {
+  async fetchPessoa_s() {
     try {
-      // Criar rota de conexão
+
       const baseRoute = this.createBaseRoute();
 
-      // Faz a request usando a api com o axios
-      const response = await this.apiClient.get(baseRoute);
+      const response = await api.get(baseRoute);
 
       // Retorna a função com a criação de objetos
       return response.data.value.map((pessoa: IPessoa) =>
@@ -44,14 +40,11 @@ export default class PessoaRepository {
 
   async createPessoa(form: IPessoa) {
     try {
-      // Criar rota de conexão
-      const baseRoute = this.createBaseRoute();
+      const baseRoute = this.pessoaRoutes.post();
 
-      // Faz o post usando a api com o axios e enviando os dados
-      const response = await this.apiClient.post(baseRoute, form);
+      const response = await api.post(baseRoute, form);
 
-      // Retorna a resposta do backend
-      return response;
+      return response; // Retorna a resposta do backend
 
     } catch (error) {
       console.error("Erro ao criar pessoa.", error);
@@ -61,13 +54,10 @@ export default class PessoaRepository {
 
   async updatePessoa(Id: number, form: IPessoa) {
     try {
-      // Criar rota de conexão
-      const baseRoute = this.createBaseRoute(Id);
+      const baseRoute = this.pessoaRoutes.update(Id);
 
-      // Faz o put
-      const response = await this.apiClient.put(baseRoute, form);
+      const response = await api.put(baseRoute, form);
 
-      // Retorna a resposta do backend
       return response;
 
     } catch (error) {
@@ -78,13 +68,9 @@ export default class PessoaRepository {
 
   async deletePessoa(Id: number) {
     try {
-      // Criar rota de conexão
-      const deleteRoute = this.createDeleteRoute(Id);
+      const baseRoute = this.pessoaRoutes.delete(Id);
+      const response = await api.delete(baseRoute);
 
-      // Faz o delete usando a api com o axios e enviando os dados
-      const response = await this.apiClient.delete(deleteRoute);
-
-      // Retorna a resposta do backend
       return response;
 
     } catch (error) {
@@ -95,8 +81,8 @@ export default class PessoaRepository {
 
   async getHistoricosCargo(Id: number): Promise<IHistoricoCargo[]> {
     try {
-      const route = this.createBaseRoute(Id);
-      const response = await api.get<IPessoa>(route);
+      const baseRoute = this.pessoaRoutes.getById(Id)
+      const response = await api.get<IPessoa>(baseRoute);
 
       return response.data.HistoricosCargo ?? [];
 

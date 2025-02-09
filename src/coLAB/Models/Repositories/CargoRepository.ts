@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import { Cargo, ICargo } from '../Entities/Cargo';
-import CargoRoutes from './ApiRoutes/CargoRoutes';
+import CargoRoutes from '../ApiRoutes/CargoRoutes';
 
 export default class CargoRepository {
   apiClient;

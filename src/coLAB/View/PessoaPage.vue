@@ -6,9 +6,17 @@
   import PessoaController from '../Controllers/PessoaController';
   import type { IHistoricoCargo } from '../Models/Entities/HistoricoCargo';
 
+  const pessoaController = new PessoaController();
+
   const snackbar = ref(false);
   const mensagemSnackbar = ref('');
   const corSnackbar = ref('');
+
+  const pessoas = ref<IPessoa[]>([]);
+  const historicos = ref<IHistoricoCargo[]>([]);
+
+  const dialog = ref(false);
+
 
   function snackbarSuccess(mensagem?: string) {
     corSnackbar.value = 'success';
@@ -21,55 +29,27 @@
     mensagemSnackbar.value = mensagem || 'Ocorreu um erro!';
   }
 
-  const rules = {
-    required: (v: any) => (
-      v === null || v === undefined || v === '' ? 'Campo obrigatório' : true
-    )
-  }
-
-  const pessoaController = new PessoaController();
-  const pessoas = ref<IPessoa[]>([]);
-
-  const dialog = ref(false);
-
-  const pessoaSelecionada = ref<IPessoa>(
-    new Pessoa(
-      0,
-      '',
-      '',
-      '',
-      '',
-      undefined,
-      undefined,
-    )
-  );
 
   const carregarPessoas = async () => {
     pessoas.value = await pessoaController.getAll();
   }
 
-  const adjustDatesContainer = ref(false);
-  const checkScreenSize = () => {
-    adjustDatesContainer.value = window.innerWidth <= 1264;
-  }
 
-  onMounted(() => {
-    carregarPessoas();
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-  });
-
-  const novaPessoa = () => {
-    pessoaSelecionada.value = new Pessoa(
-      0,
-      '',
-      '',
-      '',
-      '',
-      undefined,
-      undefined,
-    );
+  const criarPessoa = () => {
+    pessoaSelecionada.value = new Pessoa(0, '', '', '', '', undefined, undefined);
     dialog.value = true;
+  };
+
+  const criarPessoa = async () => {
+    try {
+      await pessoaController.create(pessoaSelecionada.value);
+      snackbarSuccess('Pessoa criada com sucesso!');
+      dialog.value = false;
+      await carregarPessoas();
+    } catch (error) {
+      console.error('Erro ao criar pessoa:', error);
+      snackbarError();
+    }
   }
 
   const editarPessoa = (pessoa: IPessoa) => {
@@ -77,20 +57,16 @@
     dialog.value = true;
   }
 
-  const salvarPessoa = async () => {
+  const atualizarPessoa = async () => {
     try {
       if (pessoaSelecionada.value.Id) {
         await pessoaController.update(pessoaSelecionada.value.Id, pessoaSelecionada.value);
         snackbarSuccess('Pessoa atualizada com sucesso!');
-      } else {
-        await pessoaController.create(pessoaSelecionada.value);
-        snackbarSuccess('Pessoa criada com sucesso!');
+        dialog.value = false;
+        await carregarPessoas();
       }
-
-      dialog.value = false;
-      await carregarPessoas();
     } catch (error) {
-      console.error('Erro ao salvar pessoa:', error);
+      console.error('Erro ao atualizar pessoa:', error);
       snackbarError();
     }
   }
@@ -102,12 +78,22 @@
     }
   }
 
+  const pessoaSelecionada = ref<IPessoa>(
+    new Pessoa(0, '', '', '', '', undefined, undefined)
+  );
+
   async function abrirDialog(pessoaId: number) {
     await carregarHistoricos(pessoaId);
     dialog.value = true;
   }
 
-  const historicos = ref<IHistoricoCargo[]>([]);
+  const rules = {
+    required: (v: any) => (
+      v === null || v === undefined || v === '' ? 'Campo obrigatório' : true
+    )
+  }
+
+
   async function carregarHistoricos(pessoaId: number) {
     try {
       historicos.value = await pessoaController.getHistoricosCargo(pessoaId);
@@ -115,6 +101,12 @@
       console.error("Erro ao buscar históricos de cargo:", error);
     };
   }
+
+
+  onMounted(() => {
+    carregarPessoas();
+  });
+
 </script>
 
 <template>
@@ -123,7 +115,7 @@
       <v-card-title>
         <span class="text-h5">Gerenciamento de Pessoas</span>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="novaPessoa">Nova Pessoa</v-btn>
+        <v-btn color="primary" @click="criarPessoa">Cadastrar Pessoa</v-btn>
       </v-card-title>
 
       <v-data-table :headers="[
@@ -132,7 +124,6 @@
         { title: 'Telefone', key: 'Telefone' },
         { title: 'CPF', key: 'CPF' },
         { title: 'Bolsa', key: 'Bolsa' },
-        { title: 'Historico', key: 'Historico' },
         { title: 'Ações', key: 'acoes', sortable: false },
       ]" :items="pessoas" class="elevation-1">
         <template v-slot:item="{ item }">

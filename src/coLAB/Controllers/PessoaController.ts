@@ -1,31 +1,27 @@
-import type { IHistoricoCargo } from '../Models/Entities/HistoricoCargo';
 import type { IPessoa } from '../Models/Entities/Pessoa';
-import PessoaRepository from '../Models/Repositories/PessoaRepository';
+import PessoaService from '../Services/PessoaService';
 
 export default class PessoaController {
-  pessoaRepository;
 
-  constructor() {
-    this.pessoaRepository = new PessoaRepository();
-  }
+  private pessoaService = new PessoaService();
 
   async getAll() {
-    return await this.pessoaRepository.fetchAllPessoa();
+    return await this.pessoaService.getAll();
   }
 
   async create(form: IPessoa) {
-    return await this.pessoaRepository.createPessoa(form);
+    return await this.pessoaService.create(form);
   }
 
   async update(Id: number, item: IPessoa) {
-    return await this.pessoaRepository.updatePessoa(Id, item);
+    return await this.pessoaService.update(Id, item);
   }
 
   async delete(Id: number) {
-    return await this.pessoaRepository.deletePessoa(Id);
+    return await this.pessoaService.delete(Id);
   }
 
-  async getHistoricosCargo(Id: number): Promise<IHistoricoCargo[]> {
-    return await this.pessoaRepository.getHistoricosCargo(Id);
+  async getHistoricosCargo(Id: number) {
+    return await this.pessoaService.getHistoricosCargo(Id);
   }
 }

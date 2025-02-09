@@ -1,7 +1,7 @@
 import api from '@/services/api';
 import type { ITipoBolsa } from './TipoBolsa';
 import { TipoBolsa } from './TipoBolsa';
-import TipoBolsaRoutes from './apiRoutes/TipoBolsaRoutes';
+import TipoBolsaRoutes from '../ApiRoutes/TipoBolsaRoutes';
 
 export default class TipoBolsaRepository {
   apiClient;

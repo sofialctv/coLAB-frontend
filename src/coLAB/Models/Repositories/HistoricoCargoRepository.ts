@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import { HistoricoCargo, IHistoricoCargo } from '../Entities/HistoricoCargo';
-import HistoricoCargoRoutes from './ApiRoutes/HistoricoCargoRoutes';
+import HistoricoCargoRoutes from '../ApiRoutes/HistoricoCargoRoutes';
 
 export default class HistoricoCargoRepository {
   apiClient;

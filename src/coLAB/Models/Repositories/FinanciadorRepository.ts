@@ -1,6 +1,6 @@
 import api from '@/services/api';
 import { Financiador, IFinanciador } from '../Entities/Financiador';
-import FinanciadorRoutes from './ApiRoutes/FinanciadorRoutes';
+import FinanciadorRoutes from '../ApiRoutes/FinanciadorRoutes';
 
 export default class FinanciadorRepository {
   apiClient;
@@ -18,13 +18,13 @@ export default class FinanciadorRepository {
 
   async fetchAllFinanciador() {
     try {
-      // Criar rota de conexão
+      // Criar rota de conexï¿½o
       const baseRoute = this.createBaseRoute();
 
       // Faz a request usando a api com o axios
       const response = await this.apiClient.get(baseRoute);
 
-      // Retorna a função com a criação de objetos
+      // Retorna a funï¿½ï¿½o com a criaï¿½ï¿½o de objetos
         return response.data.value.map((financiador: IFinanciador) =>
         new Financiador (
           financiador.Id,
@@ -40,7 +40,7 @@ export default class FinanciadorRepository {
 
     async createFinanciador(form: IFinanciador) {
     try {
-      // Criar rota de conexão
+      // Criar rota de conexï¿½o
       const baseRoute = this.createBaseRoute();
 
       // Faz o post usando a api com o axios e enviando os dados
@@ -57,10 +57,10 @@ export default class FinanciadorRepository {
 
     async updateFinanciador(Id: number, form: IFinanciador) {
     try {
-      // Criar rota de conexão
+      // Criar rota de conexï¿½o
       const baseRoute = this.createBaseRoute();
 
-      // Garante que o Id está salvo dentro do form
+      // Garante que o Id estï¿½ salvo dentro do form
       form.Id = Id;
 
       // Faz o put usando a api com o axios e enviando os dados
@@ -77,7 +77,7 @@ export default class FinanciadorRepository {
 
   async deleteFinanciador(Id: number) {
     try {
-      // Criar rota de conexão
+      // Criar rota de conexï¿½o
       const deleteRoute = this.createDeleteRoute(Id);
 
       // Faz o delete usando a api com o axios e enviando os dados

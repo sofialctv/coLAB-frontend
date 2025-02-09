@@ -1,7 +1,7 @@
 import api from '@/services/api'
 import type { IProjeto } from '../Entities/Projeto'
 import { Projeto } from '../Entities/Projeto'
-import ProjetoRoutes from './ApiRoutes/ProjetoRoutes'
+import ProjetoRoutes from '../ApiRoutes/ProjetoRoutes'
 
 export default class ProjetoRepository {
   apiClient
