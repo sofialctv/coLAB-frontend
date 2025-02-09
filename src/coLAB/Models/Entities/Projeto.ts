@@ -11,6 +11,7 @@ export interface IProjeto {
   orcamento: number
   financiadorId: number | null
   financiadorNome: string
+  status: number
   bolsa?: IBolsa[]
   historicoStatus?: IHistoricoStatus[]
 }
@@ -26,6 +27,7 @@ export class Projeto implements IProjeto {
     public orcamento: number,
     public financiadorId: number | null,
     public financiadorNome: string,
+    public status: number,
     public bolsa?: IBolsa[],
     public historicoStatus?: IHistoricoStatus[],
   ) {}

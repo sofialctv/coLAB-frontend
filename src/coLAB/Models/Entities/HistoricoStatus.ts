@@ -1,5 +1,5 @@
 export interface IHistoricoStatus {
-  id: number
+  status: number
   dataInicio: Date
   dataFim: Date
   statusDescricao: string
@@ -7,12 +7,12 @@ export interface IHistoricoStatus {
 
 export class HistoricoStatus implements IHistoricoStatus {
   public constructor(
-    public id: number,
+    public status: number,
     public dataInicio: Date,
     public dataFim: Date,
     public statusDescricao: string,
   ) {
-    this.id = id
+    this.status = status
     this.dataInicio = dataInicio
     this.dataFim = dataFim
     this.statusDescricao = statusDescricao

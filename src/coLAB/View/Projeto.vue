@@ -4,6 +4,7 @@ import ProjetoController from '../Controllers/ProjetoController'
 import type { IProjeto } from '../Models/Entities/Projeto'
 import { Projeto } from '../Models/Entities/Projeto'
 import GenericSnackbar from '@/view/generic/GenericSnackbar.vue'
+import { ProjetoStatus } from '../Models/Entities/Enums/ProjetoStatus'
 
 const snackbar = ref(false);
 const mensagemSnackbar = ref('');
@@ -21,6 +22,10 @@ function snackbarError(message?: string) {
   mensagemSnackbar.value = message || 'Ocorreu um erro!';
 }
 
+const rules = {
+  required: (v: any) => (v === null || v === undefined || v === '' ? "Campo obrigatório" : true),
+};
+
 // Definindo a lista de financiadores (somente exemplo)
 const financiadores = ref<any[]>([])
 
@@ -32,7 +37,7 @@ const projetos = ref<IProjeto[]>([])
 
 // Estado do modal e projeto editável
 const dialog = ref(false)
-const projetoSelecionado = ref<IProjeto>(new Projeto(null, '', new Date(), null, new Date(), '', 0, null, ''))
+const projetoSelecionado = ref<IProjeto>(new Projeto(null, '', new Date(), null, new Date(), '', 0, null, '', 1))
 
 // Carregar projetos ao iniciar
 const carregarProjetos = async () => {
@@ -62,7 +67,7 @@ onMounted(() => {
 
 // Abrir modal para adicionar novo projeto
 const abrirNovoProjeto = () => {
-  projetoSelecionado.value = new Projeto(null, '', new Date(), null, new Date(), '', 0, null, '')
+  projetoSelecionado.value = new Projeto(null, '', new Date(), null, new Date(), '', 0, null, '', 1)
   dialog.value = true
 }
 
@@ -86,6 +91,14 @@ const formatarDataParaYYYYMMDD = (dataISO: string | Date) => {
   const data = new Date(dataISO);
   return data.toISOString().split('T')[0]; // Retorna apenas a parte YYYY-MM-DD
 };
+
+// Lista de opções do dropdown baseada no enum
+const statusOptions = Object.keys(ProjetoStatus)
+  .filter((key) => isNaN(Number(key))) // Filtra apenas as chaves do enum (ignorando os valores numéricos)
+  .map((key) => ({
+    text: key, // Nome do status
+    value: ProjetoStatus[key as keyof typeof ProjetoStatus], // Valor numérico correspondente
+  }));
 
 // Salvar projeto (criação ou edição)
 const salvarProjeto = async () => {
@@ -171,7 +184,7 @@ const excluirProjeto = async (id: number) => {
             <label class="required-label">Nome</label>
             <v-text-field
               v-model="projetoSelecionado.nome"
-              required
+              :rules="[rules.required]"
               class="mb-4"
               outlined
             ></v-text-field>
@@ -180,7 +193,7 @@ const excluirProjeto = async (id: number) => {
             <label class="required-label">Descrição</label>
             <v-text-field
               v-model="projetoSelecionado.descricao"
-              required
+              :rules="[rules.required]"
               class="mb-4"
               outlined
             ></v-text-field>
@@ -192,7 +205,7 @@ const excluirProjeto = async (id: number) => {
                 <v-text-field
                   v-model.number="projetoSelecionado.orcamento"
                   type="number"
-                  required
+                  :rules="[rules.required]"
                   class="mb-4"
                   outlined
                 ></v-text-field>
@@ -204,6 +217,7 @@ const excluirProjeto = async (id: number) => {
                 <v-select
                   v-model="projetoSelecionado.financiadorId"
                   :items="financiadores"
+                  :rules="[rules.required]"
                   item-title="nome"
                   item-value="id"
                   class="mb-4"
@@ -213,12 +227,25 @@ const excluirProjeto = async (id: number) => {
               </div>
             </div>
 
+            <!-- Status -->
+            <label class="required-label">Status</label>
+            <v-select
+              v-model="projetoSelecionado.status"
+              :items="statusOptions"
+              item-title="text"
+              item-value="value"
+              :rules="[rules.required]"
+              class="mb-4"
+              outlined
+            ></v-select>
+
             <v-row>
               <!-- Data de Início -->
               <v-col :cols="adjustDatesContainer ? 12 : 4">
                 <label class="required-label">Data de Início</label>
                 <v-text-field
                   v-model="projetoSelecionado.dataInicio"
+                  :rules="[rules.required]"
                   type="date"
                   class="mb-4"
                   outlined
@@ -230,6 +257,7 @@ const excluirProjeto = async (id: number) => {
                 <label class="required-label">Data Prevista de Fim</label>
                 <v-text-field
                   v-model="projetoSelecionado.dataPrevistaFim"
+                  :rules="[rules.required]"
                   type="date"
                   class="mb-4"
                   outlined

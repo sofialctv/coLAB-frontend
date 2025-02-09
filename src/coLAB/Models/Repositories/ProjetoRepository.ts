@@ -22,26 +22,36 @@ export default class ProjetoRepository {
       // Criar rota de conexão
       const baseRoute = this.createBaseRoute()
 
-      // Faz a request usando a api com o axios
+      // Faz a request usando a API com o axios
       const response = await this.apiClient.get(baseRoute)
 
       // Retorna a função com a criação de objetos
-      return response.data.$values.map(
-        (projeto: IProjeto) =>
-          new Projeto(
-            projeto.id,
-            projeto.nome,
-            projeto.dataInicio,
-            projeto.dataFim,
-            projeto.dataPrevistaFim,
-            projeto.descricao,
-            projeto.orcamento,
-            projeto.financiadorId,
-            projeto.financiadorNome,
-            projeto.bolsa,
-            projeto.historicoStatus,
-          ),
-      )
+      return response.data.$values.map((projeto: IProjeto) => {
+        // Verificar o histórico de status e pegar o último status válido
+        const ultimoStatus = projeto
+          .historicoStatus!.$values!.filter((status: any) => !status.dataFim) // apenas o status sem dataFim
+          .sort(
+            (a: any, b: any) => new Date(b.dataInicio).getTime() - new Date(a.dataInicio).getTime(),
+          ) // dataInicio mais recente
+
+        // definindo o status como o valor do último item no histórico
+        const statusAtual = ultimoStatus[0].status
+
+        return new Projeto(
+          projeto.id,
+          projeto.nome,
+          projeto.dataInicio,
+          projeto.dataFim,
+          projeto.dataPrevistaFim,
+          projeto.descricao,
+          projeto.orcamento,
+          projeto.financiadorId,
+          projeto.financiadorNome,
+          statusAtual, // status mais atual do projeto
+          projeto.bolsa,
+          projeto.historicoStatus,
+        )
+      })
     } catch (error) {
       console.error('Erro ao buscar projetos.', error)
       throw error
