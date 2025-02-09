@@ -3,14 +3,26 @@ import { ref, onMounted } from 'vue'
 import ProjetoController from '../Controllers/ProjetoController'
 import type { IProjeto } from '../Models/Entities/Projeto'
 import { Projeto } from '../Models/Entities/Projeto'
+import GenericSnackbar from '@/view/generic/GenericSnackbar.vue'
+
+const snackbar = ref(false);
+const mensagemSnackbar = ref('');
+const corSnackbar = ref('');
+
+function snackbarSuccess(message?: string) {
+  corSnackbar.value = 'success';
+  snackbar.value = true;
+  mensagemSnackbar.value = message || 'Ação concluída com sucesso!';
+}
+
+function snackbarError(message?: string) {
+  corSnackbar.value = 'error';
+  snackbar.value = true;
+  mensagemSnackbar.value = message || 'Ocorreu um erro!';
+}
 
 // Definindo a lista de financiadores (somente exemplo)
 const financiadores = ref<any[]>([])
-
-// Regras de validação
-const rules = {
-  required: (value: any) => !!value || 'Campo obrigatório',
-}
 
 // Instância do controller
 const projetoController = new ProjetoController()
@@ -39,9 +51,9 @@ onMounted(() => {
 
   // Carregar financiador (esse é apenas um exemplo)
   financiadores.value = [
-    { id: 1, nome: 'Financiador A' },
-    { id: 2, nome: 'Financiador B' },
-    { id: 3, nome: 'Financiador C' }
+    { id: 1, nome: 'Financiador Exemplo A' },
+    { id: 2, nome: 'Financiador Exemplo B' },
+    { id: 3, nome: 'Financiador Exemplo C' }
   ]
 
   checkScreenSize()
@@ -50,32 +62,58 @@ onMounted(() => {
 
 // Abrir modal para adicionar novo projeto
 const abrirNovoProjeto = () => {
-  projetoSelecionado.value = new Projeto(0, '', new Date(), new Date(), new Date(), '', 0, 0, '')
+  projetoSelecionado.value = new Projeto(null, '', new Date(), null, new Date(), '', 0, null, '')
   dialog.value = true
 }
 
 // Abrir modal para edição
 const editarProjeto = (projeto: IProjeto) => {
-  // Garantindo que as datas sejam instâncias de Date
   projetoSelecionado.value = {
     ...projeto,
-    dataInicio: new Date(projeto.dataInicio),
-    dataFim: projeto.dataFim ? new Date(projeto.dataFim) : null, // Lidar com dataFim nula
-    dataPrevistaFim: new Date(projeto.dataPrevistaFim),
-  }
-  dialog.value = true
+    dataInicio: formatarDataParaYYYYMMDD(projeto.dataInicio),
+    dataPrevistaFim: formatarDataParaYYYYMMDD(projeto.dataPrevistaFim),
+    dataFim: projeto.dataFim ? formatarDataParaYYYYMMDD(projeto.dataFim) : null,
+  };
+  dialog.value = true;
 }
+
+const formatarDataParaISO = (dataString: string | Date) => {
+  const data = new Date(dataString);
+  return data; // Retorna no formato correto
+};
+
+const formatarDataParaYYYYMMDD = (dataISO: string | Date) => {
+  const data = new Date(dataISO);
+  return data.toISOString().split('T')[0]; // Retorna apenas a parte YYYY-MM-DD
+};
 
 // Salvar projeto (criação ou edição)
 const salvarProjeto = async () => {
-  if (projetoSelecionado.value.id) {
-    await projetoController.update(projetoSelecionado.value.id, projetoSelecionado.value)
-  } else {
-    await projetoController.create(projetoSelecionado.value)
+  try {
+    // Converte para formato ISO 8601
+    const projetoParaSalvar = {
+      ...projetoSelecionado.value,
+      dataInicio: formatarDataParaISO(projetoSelecionado.value.dataInicio),
+      dataPrevistaFim: formatarDataParaISO(projetoSelecionado.value.dataPrevistaFim),
+      dataFim: projetoSelecionado.value.dataFim ? formatarDataParaISO(projetoSelecionado.value.dataFim) : null,
+    };
+
+    // Verifica se é edição ou criação
+    if (projetoSelecionado.value.id) {
+      await projetoController.update(projetoSelecionado.value.id, projetoParaSalvar);
+      snackbarSuccess('Projeto atualizado com sucesso!');
+    } else {
+      await projetoController.create(projetoParaSalvar);
+      snackbarSuccess('Projeto criado com sucesso!');
+    }
+
+    dialog.value = false;
+    await carregarProjetos();
+  } catch (error) {
+    console.error("Erro ao salvar projeto:", error);
+    snackbarError('Erro ao salvar projeto.');
   }
-  dialog.value = false
-  await carregarProjetos()
-}
+};
 
 // Excluir projeto
 const excluirProjeto = async (id: number) => {
@@ -107,11 +145,11 @@ const excluirProjeto = async (id: number) => {
             <td>{{ item.nome }}</td>
             <td>{{ item.descricao }}</td>
             <td>{{ item.orcamento }}</td>
-            <td>
-              <v-btn icon color="blue" @click="editarProjeto(item)">
+            <td style="display: flex; gap: 0.5rem; align-items: center;">
+              <v-btn icon color="blue" size="small" @click="editarProjeto(item)">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
-              <v-btn icon color="red" @click="excluirProjeto(item.id)">
+              <v-btn icon color="red" size="small" @click="excluirProjeto(item.id!)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </td>
@@ -130,77 +168,85 @@ const excluirProjeto = async (id: number) => {
         <v-card-text>
           <v-form>
             <!-- Nome -->
+            <label class="required-label">Nome</label>
             <v-text-field
               v-model="projetoSelecionado.nome"
-              label="Nome"
               required
               class="mb-4"
               outlined
             ></v-text-field>
 
             <!-- Descrição -->
+            <label class="required-label">Descrição</label>
             <v-text-field
               v-model="projetoSelecionado.descricao"
-              label="Descrição"
               required
               class="mb-4"
               outlined
             ></v-text-field>
 
-            <!-- Orçamento -->
-            <v-text-field
-              v-model.number="projetoSelecionado.orcamento"
-              label="Orçamento"
-              type="number"
-              required
-              class="mb-4"
-              outlined
-            ></v-text-field>
+            <div class="grid-container">
+              <!-- Orçamento -->
+              <div class="grid-item">
+                <label class="required-label">Orçamento</label>
+                <v-text-field
+                  v-model.number="projetoSelecionado.orcamento"
+                  type="number"
+                  required
+                  class="mb-4"
+                  outlined
+                ></v-text-field>
+              </div>
+
+              <!-- Financiador -->
+              <div class="grid-item">
+                <label class="required-label">Fornecedor</label>
+                <v-select
+                  v-model="projetoSelecionado.financiadorId"
+                  :items="financiadores"
+                  item-title="nome"
+                  item-value="id"
+                  class="mb-4"
+                  outlined
+                  :clearable="true"
+                ></v-select>
+              </div>
+            </div>
 
             <v-row>
+              <!-- Data de Início -->
               <v-col :cols="adjustDatesContainer ? 12 : 4">
-                <span>Data de Início</span>
-                <v-date-picker
+                <label class="required-label">Data de Início</label>
+                <v-text-field
                   v-model="projetoSelecionado.dataInicio"
-                  :min="new Date()"
-                  required
+                  type="date"
                   class="mb-4"
                   outlined
-                ></v-date-picker>
+                ></v-text-field>
               </v-col>
 
+              <!-- Data Prevista de Fim -->
               <v-col :cols="adjustDatesContainer ? 12 : 4">
-                <span>Data Prevista de Fim</span>
-                <v-date-picker
+                <label class="required-label">Data Prevista de Fim</label>
+                <v-text-field
                   v-model="projetoSelecionado.dataPrevistaFim"
-                  required
+                  type="date"
                   class="mb-4"
                   outlined
-                ></v-date-picker>
+                ></v-text-field>
               </v-col>
 
+              <!-- Data de Término (NÃO OBRIGATÓRIA) -->
               <v-col :cols="adjustDatesContainer ? 12 : 4">
-                <span>Data de Término</span>
-                <v-date-picker
+                <label>Data de Término</label>
+                <v-text-field
                   v-model="projetoSelecionado.dataFim"
-                  :clearable="true"
+                  type="date"
                   class="mb-4"
                   outlined
-                ></v-date-picker>
+                ></v-text-field>
               </v-col>
             </v-row>
-
-            <!-- Financiador (Dropdown) -->
-            <v-select
-              v-model="projetoSelecionado.financiadorId"
-              label="Fornecedor"
-              :items="financiadores"
-              item-title="nome"
-              item-value="id"
-              :rules="[rules.required]"
-              class="mb-4"
-              outlined
-            ></v-select>
           </v-form>
         </v-card-text>
 
@@ -212,9 +258,23 @@ const excluirProjeto = async (id: number) => {
       </v-card>
     </v-dialog>
   </v-container>
+
+  <GenericSnackbar
+    v-model="snackbar"
+    :text="mensagemSnackbar"
+    :color="corSnackbar"
+    :timeout="3000"
+  />
 </template>
 
 <style scoped>
+/* Estiliza os rótulos com asterisco vermelho */
+.required-label::after {
+  content: " *";
+  color: red;
+  font-weight: bold;
+}
+
 .v-dialog {
   max-width: 75vw;
 }
@@ -233,10 +293,30 @@ const excluirProjeto = async (id: number) => {
   margin-bottom: 16px;
 }
 
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr); /* Divide em 12 colunas */
+  gap: 16px; /* Espaçamento entre os elementos */
+}
+
+.grid-item {
+  grid-column: span 6; /* Cada item ocupa 6 colunas */
+}
+
+.date-label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+}
+
 /* Responsividade para telas menores que 1164px */
 @media (max-width: 1164px) {
   .v-dialog {
     max-width: 95vw;
+  }
+
+  .grid-item {
+    grid-column: span 12;
   }
 }
 </style>
