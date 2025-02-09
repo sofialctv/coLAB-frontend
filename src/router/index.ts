@@ -19,6 +19,14 @@ export const router = createRouter({
       path: '/projeto',
       component: () => import('@/coLAB/View/Projeto.vue'),
     },
+    {
+      path: '/bolsa',
+      component: () => import('@/coLAB/View/Bolsa.vue'),
+    },
+    {
+      path: '/pessoa',
+      component: () => import('@/coLAB/View/PessoaPage.vue'),
+    },
   ],
 })
 

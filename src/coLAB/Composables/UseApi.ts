@@ -1,4 +1,4 @@
-import api from '../services/api'
+import api from '../API/api'
 
 /*
 * recebe uma url base (endpoint) e retorna um conjunto de funções para realizar operações na API

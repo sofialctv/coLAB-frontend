@@ -34,7 +34,8 @@ export default class BolsaRepository {
           bolsa.DataPrevistaFim,
           bolsa.Ativo,
           bolsa.TipoBolsa,
-          bolsa.Pessoa
+          bolsa.Pessoa,
+          Bolsa.Projeto
         ));
     } catch (error) {
       console.error("Erro ao buscar bolsas.", error);

@@ -1,8 +1,10 @@
-import { IPessoa } from '../Models/Entities/Pessoa';
+import type { IHistoricoCargo } from '../Models/Entities/HistoricoCargo';
+import type { IPessoa } from '../Models/Entities/Pessoa';
 import PessoaRepository from '../Models/Repositories/PessoaRepository';
 
 export default class PessoaController {
   pessoaRepository;
+
   constructor() {
     this.pessoaRepository = new PessoaRepository();
   }
@@ -21,5 +23,9 @@ export default class PessoaController {
 
   async delete(Id: number) {
     return await this.pessoaRepository.deletePessoa(Id);
+  }
+
+  async getHistoricosCargo(Id: number): Promise<IHistoricoCargo[]> {
+    return await this.pessoaRepository.getHistoricosCargo(Id);
   }
 }

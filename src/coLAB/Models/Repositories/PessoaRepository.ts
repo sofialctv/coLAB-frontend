@@ -1,15 +1,15 @@
 import api from '@/services/api';
-import { Pessoa, IPessoa } from '../Entities/Pessoa';
+import type { IPessoa } from '../Entities/Pessoa';
+import { Pessoa } from '../Entities/Pessoa';
 import PessoaRoutes from './ApiRoutes/PessoaRoutes';
+import type { IHistoricoCargo } from '../Entities/HistoricoCargo';
 
 export default class PessoaRepository {
-  apiClient;
-  constructor() {
-    this.apiClient = api;
-  }
 
-  createBaseRoute() {
-    return new PessoaRoutes({}).getAll;
+  private pessoaRoutes = new PessoaRoutes({});
+
+  createBaseRoute(Id?: number) : string {
+    return Id ? `${this.pessoaRoutes.getAll}/${Id}` : baseRoute;
   }
 
   createDeleteRoute(id: number) {
@@ -62,12 +62,9 @@ export default class PessoaRepository {
   async updatePessoa(Id: number, form: IPessoa) {
     try {
       // Criar rota de conexão
-      const baseRoute = this.createBaseRoute();
+      const baseRoute = this.createBaseRoute(Id);
 
-      // Garante que o Id está salvo dentro do form
-      form.Id = Id;
-
-      // Faz o put usando a api com o axios e enviando os dados
+      // Faz o put
       const response = await this.apiClient.put(baseRoute, form);
 
       // Retorna a resposta do backend
@@ -93,6 +90,19 @@ export default class PessoaRepository {
     } catch (error) {
       console.error("Erro ao deletar a pessoa.", error);
       throw error;
+    }
+  }
+
+  async getHistoricosCargo(Id: number): Promise<IHistoricoCargo[]> {
+    try {
+      const route = this.createBaseRoute(Id);
+      const response = await api.get<IPessoa>(route);
+
+      return response.data.HistoricosCargo ?? [];
+
+    } catch (error) {
+      console.error("Erro ao buscar históricos de cargo: ", error);
+      throw Error;
     }
   }
 }

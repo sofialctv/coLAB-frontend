@@ -1,4 +1,4 @@
-import { IHistoricoCargo } from './HistoricoCargo';
+import type { IHistoricoCargo } from './HistoricoCargo';
 import { Bolsa } from './Bolsa';
 
 export interface IPessoa {
@@ -8,8 +8,8 @@ export interface IPessoa {
     Telefone: string;
     Cpf: string;
 
-    Bolsa: Bolsa;
-    HistoricosCargo: IHistoricoCargo[];
+    Bolsa?: Bolsa;
+    HistoricosCargo?: IHistoricoCargo[];
 }
 
 export class Pessoa implements IPessoa {
@@ -19,8 +19,8 @@ export class Pessoa implements IPessoa {
         public Email: string,
         public Telefone: string,
         public Cpf: string,
-        public Bolsa: Bolsa,
-        public HistoricosCargo: IHistoricoCargo[]
+        public Bolsa?: Bolsa,
+        public HistoricosCargo?: IHistoricoCargo[]
     ) {
         this.Id = Id;
         this.Nome = Nome;
