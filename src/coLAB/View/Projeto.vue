@@ -37,7 +37,7 @@ const projetos = ref<IProjeto[]>([])
 
 // Estado do modal e projeto editável
 const dialog = ref(false)
-const projetoSelecionado = ref<IProjeto>(new Projeto(null, '', new Date(), null, new Date(), '', 0, null, '', 1))
+const projetoSelecionado = ref<IProjeto>(new Projeto(0, '', new Date(), null, new Date(), '', 0, null, '', 1))
 
 // Carregar projetos ao iniciar
 const carregarProjetos = async () => {
@@ -67,7 +67,7 @@ onMounted(() => {
 
 // Abrir modal para adicionar novo projeto
 const abrirNovoProjeto = () => {
-  projetoSelecionado.value = new Projeto(null, '', new Date(), null, new Date(), '', 0, null, '', 1)
+  projetoSelecionado.value = new Projeto(0, '', new Date(), null, new Date(), '', 0, null, '', 1)
   dialog.value = true
 }
 
