@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import FinanciadorController from '../Controllers/FinanciadorController'
 import type { IFinanciador } from '../Models/Entities/Financiador'
 import { Financiador } from '../Models/Entities/Financiador'
-import GenericSnackbar from '@/view/generic/GenericSnackbar.vue'
+import GenericSnackbar from '../../components/GenericSnackbar.vue';
 
 const snackbar = ref(false);
 const mensagemSnackbar = ref('');
@@ -153,7 +153,6 @@ const excluirFinanciador = async (id: number) => {
                           :rules="[rules.required]"
                           class="mb-4"
                           outlined></v-text-field>
-            </div>
           </v-form>
         </v-card-text>
 

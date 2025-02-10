@@ -1,4 +1,4 @@
-import { IBolsa } from './Bolsa';
+import type { IBolsa } from './Bolsa';
 import { Escolaridade } from './Enums/Escolaridade';
 
 export interface ITipoBolsa {

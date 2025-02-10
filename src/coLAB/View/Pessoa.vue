@@ -2,7 +2,7 @@
   import { ref, onMounted } from 'vue';
   import type { IPessoa } from '../Models/Entities/Pessoa';
   import { Pessoa } from '../Models/Entities/Pessoa';
-  import GenericSnackbar from '@/view/generic/GenericSnackbar.vue'
+  import GenericSnackbar from '../../components/GenericSnackbar.vue';
   import PessoaController from '../Controllers/PessoaController';
   import type { IHistoricoCargo } from '../Models/Entities/HistoricoCargo';
 
@@ -120,18 +120,18 @@
 
       <v-data-table :headers="[
         { title: 'Nome', key: 'Nome' },
+        { title: 'CPF', key: 'CPF' },
         { title: 'Email', key: 'Email' },
         { title: 'Telefone', key: 'Telefone' },
-        { title: 'CPF', key: 'CPF' },
         { title: 'Bolsa', key: 'Bolsa' },
         { title: 'Ações', key: 'acoes', sortable: false },
       ]" :items="pessoas" class="elevation-1">
         <template v-slot:item="{ item }">
           <tr>
             <td>{{ item.Nome }}</td>
+            <td>{{ item.Cpf }}</td>
             <td>{{ item.Email }}</td>
             <td>{{ item.Telefone }}</td>
-            <td>{{ item.Cpf }}</td>
             <td>{{ item.Bolsa }}</td>
             <td style="display: flex; gap: 0.5rem; align-items: center;">
               <v-btn icon color="green" size="small" @click="carregarHistoricos(item.Id)">
@@ -213,13 +213,12 @@
             ></v-text-field>
           </v-form>
         </v-card-text>
-      </v-card>
 
       <v-card-actions>
-          <v-btn color="grey" @click="dialog = false">Cancelar</v-btn>
-          <v-spacer></v-spacer>
+          <v-btn color="red" @click="dialog = false">Cancelar</v-btn>
           <v-btn color="green" @click="salvarPessoa">Salvar</v-btn>
-      </v-card-actions>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
   </v-container>
 

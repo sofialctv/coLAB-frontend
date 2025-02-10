@@ -5,27 +5,23 @@ export const router = createRouter({
   routes: [
     {
       path: '/',
-      component: () => import('@/view/index-cidade.vue'),
-    },
-    {
-      path: '/cliente',
-      component: () => import('@/view/index-cliente.vue'),
-    },
-    {
-      path: '/pedido',
-      component: () => import('@/view/index-pedido.vue'),
-    },
-    {
-      path: '/projeto',
-      component: () => import('@/coLAB/View/Projeto.vue'),
+      component: () => import('@/coLAB/View/Home.vue'),
     },
     {
       path: '/bolsa',
       component: () => import('@/coLAB/View/Bolsa.vue'),
     },
     {
+      path: '/financiador',
+      component: () => import('@/coLAB/View/Financiador.vue'),
+    },
+    {
       path: '/pessoa',
-      component: () => import('@/coLAB/View/PessoaPage.vue'),
+      component: () => import('@/coLAB/View/Pessoa.vue'),
+    },
+    {
+      path: '/projeto',
+      component: () => import('@/coLAB/View/Projeto.vue'),
     },
   ],
 })
