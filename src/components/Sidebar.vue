@@ -14,7 +14,7 @@
         title="Bolsas"
         value="bolsas"
         class="text-white"
-        to="/bolsas"
+        to="/bolsa"
       ></v-list-item>
 
       <v-list-item
@@ -22,23 +22,23 @@
         title="Financiadores"
         value="financiadores"
         class="text-white"
-        to="/financiadores"
+        to="/financiador"
       ></v-list-item>
 
       <v-list-item
         prepend-icon="mdi-account-multiple"
         title="Pessoas"
-        value="pessoas"
+        value="pessoa"
         class="text-white"
-        to="/pessoas"
+        to="/pessoa"
       ></v-list-item>
 
       <v-list-item
         prepend-icon="mdi-lightbulb-on-outline"
         title="Projetos"
-        value="projetos"
+        value="projeto"
         class="text-white"
-        to="/projetos"
+        to="/projeto"
       ></v-list-item>
     </v-list>
   </v-navigation-drawer>

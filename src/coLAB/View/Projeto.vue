@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import ProjetoController from '../Controllers/ProjetoController'
 import type { IProjeto } from '../Models/Entities/Projeto'
 import { Projeto } from '../Models/Entities/Projeto'
-import GenericSnackbar from '@/view/generic/GenericSnackbar.vue'
+import GenericSnackbar from '../../components/GenericSnackbar.vue';
 import { ProjetoStatus } from '../Models/Entities/Enums/ProjetoStatus'
 
 const snackbar = ref(false);
@@ -279,8 +279,7 @@ const excluirProjeto = async (id: number) => {
         </v-card-text>
 
         <v-card-actions>
-          <v-btn color="grey" @click="dialog = false">Cancelar</v-btn>
-          <v-spacer></v-spacer>
+          <v-btn color="red" @click="dialog = false">Cancelar</v-btn>
           <v-btn color="green" @click="salvarProjeto">Salvar</v-btn>
         </v-card-actions>
       </v-card>

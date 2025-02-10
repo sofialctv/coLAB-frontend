@@ -1,9 +1,7 @@
 <template>
   <v-app>
-    <!-- Sidebar Fixa -->
     <Sidebar />
-
-    <v-main>
+    <v-main style="padding-left: 250px;">
       <router-view></router-view>
     </v-main>
   </v-app>
