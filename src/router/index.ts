@@ -5,23 +5,23 @@ export const router = createRouter({
   routes: [
     {
       path: '/',
-      component: () => import('@/coLAB/View/Home.vue'),
+      component: () => import('@/views/Home.vue'),
     },
     {
       path: '/bolsa',
-      component: () => import('@/coLAB/View/Bolsa.vue'),
+      component: () => import('@/views/Bolsa.vue'),
     },
     {
       path: '/financiador',
-      component: () => import('@/coLAB/View/Financiador.vue'),
+      component: () => import('@/views/Financiador.vue'),
     },
     {
       path: '/pessoa',
-      component: () => import('@/coLAB/View/Pessoa.vue'),
+      component: () => import('@/views/Pessoa.vue'),
     },
     {
       path: '/projeto',
-      component: () => import('@/coLAB/View/Projeto.vue'),
+      component: () => import('@/views/Projeto.vue'),
     },
   ],
 })
