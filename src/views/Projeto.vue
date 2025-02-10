@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import ProjetoController from '../controllers/ProjetoController'
-import type { IProjeto } from '../../Models/Entities/Projeto'
-import { Projeto } from '../../Models/Entities/Projeto'
-import GenericSnackbar from '../../components/GenericSnackbar.vue';
-import { ProjetoStatus } from '../../Models/Entities/Enums/ProjetoStatus'
+import type { IProjeto } from '../models/Entities/Projeto'
+import { Projeto } from '../models/Entities/Projeto'
+import GenericSnackbar from '../components/GenericSnackbar.vue';
+import { ProjetoStatus } from '../models/Entities/Enums/ProjetoStatus'
 
 const snackbar = ref(false);
 const mensagemSnackbar = ref('');

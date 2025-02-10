@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import FinanciadorController from '../controllers/FinanciadorController'
-import type { IFinanciador } from '../../Models/Entities/Financiador'
-import { Financiador } from '../../Models/Entities/Financiador'
-import GenericSnackbar from '../../components/GenericSnackbar.vue';
+import type { IFinanciador } from '../models/Entities/Financiador'
+import { Financiador } from '../models/Entities/Financiador'
+import GenericSnackbar from '../components/GenericSnackbar.vue';
 
 const snackbar = ref(false);
 const mensagemSnackbar = ref('');

@@ -1,4 +1,4 @@
-import api from '@/services/api'
+import api from '@/api/api'
 import type { IProjeto } from '../Entities/Projeto'
 import { Projeto } from '../Entities/Projeto'
 import ProjetoRoutes from '../ApiRoutes/ProjetoRoutes'

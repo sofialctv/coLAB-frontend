@@ -1,7 +1,7 @@
-import api from '@/services/api';
+import api from '@/api/api';
 import type { IBolsa } from '../Entities/Bolsa';
 import { Bolsa } from '../Entities/Bolsa';
-import BolsaRoutes from './ApiRoutes/BolsaRoutes';
+import BolsaRoutes from '../ApiRoutes/BolsaRoutes';
 
 export default class BolsaRepository {
   apiClient;

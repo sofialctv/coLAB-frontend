@@ -1,4 +1,4 @@
-import { IHistoricoCargo } from '../models/Entities/HistoricoCargo';
+import type { IHistoricoCargo } from '../models/Entities/HistoricoCargo';
 import HistoricoCargoRepository from '../models/Repositories/HistoricoCargoRepository';
 
 export default class HistoricoCargoController {

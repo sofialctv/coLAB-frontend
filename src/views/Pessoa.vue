@@ -1,10 +1,10 @@
 <script setup lang="ts">
   import { ref, onMounted } from 'vue';
-  import type { IPessoa } from '../../Models/Entities/Pessoa';
-  import { Pessoa } from '../../Models/Entities/Pessoa';
-  import GenericSnackbar from '../../components/GenericSnackbar.vue';
+  import type { IPessoa } from '../models/Entities/Pessoa';
+  import { Pessoa } from '../models/Entities/Pessoa';
+  import GenericSnackbar from '../components/GenericSnackbar.vue';
   import PessoaController from '../controllers/PessoaController';
-  import type { IHistoricoCargo } from '../../Models/Entities/HistoricoCargo';
+  import type { IHistoricoCargo } from './models/Entities/HistoricoCargo';
 
   const pessoaController = new PessoaController();
 
@@ -23,6 +23,7 @@
     snackbar.value = true;
     mensagemSnackbar.value = mensagem || 'Ação concluída com sucesso!';
   }
+
   function snackbarError(mensagem?: string) {
     corSnackbar.value = 'error';
     snackbar.value = true;
@@ -35,7 +36,7 @@
   }
 
 
-  const criarPessoa = () => {
+  const cadastrarPessoa = () => {
     pessoaSelecionada.value = new Pessoa(0, '', '', '', '', undefined, undefined);
     dialog.value = true;
   };
@@ -115,7 +116,7 @@
       <v-card-title>
         <span class="text-h5">Gerenciamento de Pessoas</span>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="criarPessoa">Cadastrar Pessoa</v-btn>
+        <v-btn color="primary" @click="cadastrarPessoa">Cadastrar Pessoa</v-btn>
       </v-card-title>
 
       <v-data-table :headers="[
@@ -216,7 +217,7 @@
 
       <v-card-actions>
           <v-btn color="red" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="green" @click="salvarPessoa">Salvar</v-btn>
+          <v-btn color="green" @click="criarPessoa">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
