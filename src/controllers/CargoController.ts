@@ -1,4 +1,4 @@
-import { ICargo } from '../models/Entities/Cargo';
+import type { ICargo } from '../models/Entities/Cargo';
 import CargoRepository from '../models/Repositories/CargoRepository';
 
 export default class CargoController {
@@ -15,11 +15,11 @@ export default class CargoController {
     return await this.cargoRepository.createCargo(form);
   }
 
-  async update(Id: number, item: ICargo) {
-    return await this.cargoRepository.updateCargo(Id, item);
+  async update(Id: number, form: ICargo) {
+    return await this.cargoRepository.updateCargo(Id, form);
   }
 
-  async delete(Id: string) {
+  async delete(Id: number) {
     return await this.cargoRepository.deleteCargo(Id);
   }
 }

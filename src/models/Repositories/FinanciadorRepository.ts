@@ -1,4 +1,4 @@
-import api from '@/services/api';
+import api from '@/api/api';
 import { Financiador, IFinanciador } from '../Entities/Financiador';
 import FinanciadorRoutes from '../ApiRoutes/FinanciadorRoutes';
 

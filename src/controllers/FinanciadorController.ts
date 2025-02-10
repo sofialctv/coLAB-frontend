@@ -1,4 +1,4 @@
-import { IFinanciador } from '../models/Entities/Financiador';
+import type { IFinanciador } from '../models/Entities/Financiador';
 import FinanciadorRepository from '../models/Repositories/FinanciadorRepository';
 
 export default class FinanciadorController {
@@ -19,7 +19,7 @@ export default class FinanciadorController {
     return await this.FinanciadorRepository.updateFinanciador(Id, item);
   }
 
-  async delete(Id: string) {
+  async delete(Id: number) {
     return await this.FinanciadorRepository.deleteFinanciador(Id);
   }
 }

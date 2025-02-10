@@ -1,8 +1,3 @@
-import type { IPessoa } from './Pessoa';
-import type { ITipoBolsa } from './TipoBolsa';
-import type { IProjeto } from './Projeto';
-
-
 // Bolsa.ts
 export interface IBolsa {
     Id: number;
@@ -18,7 +13,7 @@ export interface IBolsa {
     ProjetoId: number | null;
     ProjetoNome: string;
   }
-  
+
   export class Bolsa implements IBolsa {
     public constructor (
       public Id: number,

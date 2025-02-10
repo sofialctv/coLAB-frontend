@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import BolsaController from '../controllers/BolsaController';
-import type { IBolsa } from '../../Models/Entities/Bolsa';
-import { Bolsa } from '../../Models/Entities/Bolsa';
-import GenericSnackbar from '../../components/GenericSnackbar.vue';
+import type { IBolsa } from '../Models/Entities/Bolsa';
+import { Bolsa } from '../Models/Entities/Bolsa';
+import GenericSnackbar from '../components/GenericSnackbar.vue';
 import PessoaController from '../controllers/PessoaController';
 import TipoBolsaController from '../controllers/TipoBolsaController';
 import ProjetoController from '../controllers/ProjetoController';
