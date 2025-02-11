@@ -3,6 +3,9 @@ import { ref, onMounted } from 'vue'
 import ProjetoController from '../controllers/ProjetoController'
 import type { IProjeto } from '../models/Entities/Projeto'
 import { Projeto } from '../models/Entities/Projeto'
+import FinanciadorController from '../controllers/FinanciadorController'
+import type { IFinanciador} from '../models/Entities/Financiador'
+import { Financiador } from '../models/Entities/Financiador'
 import GenericSnackbar from '../components/GenericSnackbar.vue';
 import { ProjetoStatus } from '../models/Entities/Enums/ProjetoStatus'
 
@@ -26,11 +29,12 @@ const rules = {
   required: (v: any) => (v === null || v === undefined || v === '' ? "Campo obrigatório" : true),
 };
 
-// Definindo a lista de financiadores (somente exemplo)
-const financiadores = ref<any[]>([])
+// Definindo a lista de financiadores 
+const financiadores = ref<IFinanciador[]>([])
 
-// Instância do controller
+// Instância dos controllers
 const projetoController = new ProjetoController()
+const financiadorController = new FinanciadorController()
 
 // Lista de projetos
 const projetos = ref<IProjeto[]>([])
@@ -44,6 +48,13 @@ const carregarProjetos = async () => {
   projetos.value = await projetoController.getAll()
 }
 
+// Carregar Financiadores
+const carregarFinanciadores = async () => {
+  financiadores.value = await financiadorController.getAll();
+  console.log("Financiadores carregados:", financiadores.value);
+};
+
+
 // Verificando se a tela é menor que 1164px
 const adjustDatesContainer = ref(false)
 
@@ -54,12 +65,8 @@ const checkScreenSize = () => {
 onMounted(() => {
   carregarProjetos()
 
-  // Carregar financiador (esse é apenas um exemplo)
-  financiadores.value = [
-    { id: 1, nome: 'Financiador Exemplo A' },
-    { id: 2, nome: 'Financiador Exemplo B' },
-    { id: 3, nome: 'Financiador Exemplo C' }
-  ]
+  // Carregar financiadores 
+  carregarFinanciadores()
 
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
@@ -217,9 +224,9 @@ const excluirProjeto = async (id: number) => {
                 <v-select
                   v-model="projetoSelecionado.financiadorId"
                   :items="financiadores"
+                  item-title="Nome"
+                  item-value="Id"
                   :rules="[rules.required]"
-                  item-title="nome"
-                  item-value="id"
                   class="mb-4"
                   outlined
                   :clearable="true"
