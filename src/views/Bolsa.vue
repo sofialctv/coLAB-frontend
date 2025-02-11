@@ -131,6 +131,14 @@ const formatarDataParaYYYYMMDD = (dataISO: string | Date) => {
   return data.toISOString().split('T')[0]; // Retorna a parte YYYY-MM-DD
 };
 
+const formatarDataParaDDMMYYYY = (dataISO: string | Date) => {
+  const data = new Date(dataISO);
+  const dia = String(data.getDate()).padStart(2, '0'); // Adiciona o zero à esquerda se necessário
+  const mes = String(data.getMonth() + 1).padStart(2, '0'); // Os meses em JavaScript começam do zero
+  const ano = data.getFullYear();
+  return `${dia}/${mes}/${ano}`;
+};
+
 
 // Abrir modal para edição
 const editarBolsa = (bolsa: IBolsa) => {
@@ -214,9 +222,9 @@ const excluirBolsa = async (Id: number) => {
             <td>  {{ item.Nome }} </td>
             <td>  {{ item.PlanoTrabalho }} </td>
             <td>  {{ item.PessoaNome }} </td>
-            <td>  {{ item.DataInicio }} </td>
-            <td>  {{ item.DataFim }} </td>
-            <td>  {{ item.DataPrevistaFim }}  </td>
+            <td>  {{ formatarDataParaDDMMYYYY(item.DataInicio) }} </td>
+            <td>  {{ formatarDataParaDDMMYYYY(item.DataFim) }} </td>
+            <td>  {{ formatarDataParaDDMMYYYY(item.DataPrevistaFim) }}  </td>
             <td>  {{ item.Ativo ? 'Sim' : 'Não' }}  </td>
             <td style="display: flex; gap: 0.5rem; align-items: center;">
               <v-btn icon color="blue" size="small" @click="editarBolsa(item)">

@@ -33,17 +33,17 @@ export default class PessoaRepository {
 
       // Retorna a função com a criação de objetos
       return response.data.$values.map((pessoa: IPessoaResponse) => {
-        const { Id, Nome, Email, Telefone, Cpf, CargoNome, BolsaNome, HistoricosCargo } = pessoa;
+        const { id, nome, email, telefone, cpf, cargoNome, bolsaNome, historicosCargo } = pessoa;
 
-        const cargoAtual = HistoricosCargo ? this.getCargoAtual(HistoricosCargo) : "Sem cargo";
+        const cargoAtual = historicosCargo ? this.getCargoAtual(historicosCargo) : "Sem cargo";
 
         return {
-          pessoa.id,
-          pessoa.nome,
+          id,
+          nome,
           email,
           telefone,
           cpf,
-          cargoNome: cargoAtual,
+          cargoNome,
           bolsaNome,
           historicosCargo
         };
