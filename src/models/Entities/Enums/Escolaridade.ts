@@ -1,6 +1,6 @@
 export enum Escolaridade {
-    Tecnico = "Tecnico",
-    Graduacao = "Graduacao",
-    Mestrado = "Mestrado",
-    Doutorado = "Doutorado",
+    Tecnico = 0,
+    Graduacao = 1,
+    Mestrado = 2,
+    Doutorado = 3,
 }

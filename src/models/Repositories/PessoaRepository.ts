@@ -1,45 +1,71 @@
 import api from '@/api/api';
-import type { IPessoa } from '../Entities/Pessoa';
-import { Pessoa } from '../Entities/Pessoa';
+import type { IPessoaResponse, IPessoaRequest } from '../Entities/Pessoa';
 import PessoaRoutes from '../ApiRoutes/PessoaRoutes';
-import type { IHistoricoCargo } from '../Entities/HistoricoCargo';
+import { type IHistoricoCargo } from '../Entities/HistoricoCargo';
 
 export default class PessoaRepository {
+  apiClient;
 
-  private pessoaRoutes = new PessoaRoutes();
+  constructor() {
+    this.apiClient = api;
+  };
 
-  // Se um ID for passado ele chama o getById, se não, chama o getAll
-  private createBaseRoute(Id?: number) : string {
-    return Id ? this.pessoaRoutes.getById(Id) : this.pessoaRoutes.getAll();
-  }
+  createBaseRoute() {
+    return new PessoaRoutes({}).getAll;
+  };
+
+  createDeleteRoute(id: number) {
+    return new PessoaRoutes({ id: id }).delete;
+  };
 
   async fetchPessoa_s() {
     try {
       const baseRoute = this.createBaseRoute();
-      const response = await api.get(baseRoute);
+
+      // Faz a request usando a API com o axios
+      const response = await this.apiClient.get(baseRoute)
+
+      console.log("Resposta bruta da API:\n\n\n\n", response.data);
+
+      if (!Array.isArray(response.data.$values)) {
+        throw new Error("Formato de dados inválido: esperado um array de pessoas.");
+      }
 
       // Retorna a função com a criação de objetos
-      return response.data.value.map((pessoa: IPessoa) =>
-        new Pessoa(
-          pessoa.Id,
-          pessoa.Nome,
-          pessoa.Email,
-          pessoa.Telefone,
-          pessoa.Cpf,
-          pessoa.Bolsa,
-          pessoa.HistoricosCargo
-        ));
+      return response.data.$values.map((pessoa: IPessoaResponse) => {
+        const { Id, Nome, Email, Telefone, Cpf, CargoNome, BolsaNome, HistoricosCargo } = pessoa;
+
+        const cargoAtual = HistoricosCargo ? this.getCargoAtual(HistoricosCargo) : "Sem cargo";
+
+        return {
+          pessoa.id,
+          pessoa.nome,
+          email,
+          telefone,
+          cpf,
+          cargoNome: cargoAtual,
+          bolsaNome,
+          historicosCargo
+        };
+      });
 
     } catch (error) {
-      console.error("Erro ao buscar pessoas.", error);
+      const err = error as any;
+      if (err.response) {
+        console.error("Erro na resposta da API:", err.response.status, err.response.data);
+      } else if (err.request) {
+        console.error("Erro na requisição:", err.request);
+      } else {
+        console.error("Erro ao configurar a requisição:", err.message);
+      }
       throw error;
     }
   }
 
-  async createPessoa(form: IPessoa) {
+  async createPessoa(form: IPessoaRequest) {
     try {
-      const baseRoute = this.pessoaRoutes.post();
-      const response = await api.post(baseRoute, form);
+      const baseRoute = this.createBaseRoute()
+      const response = await this.apiClient.post(baseRoute, form)
 
       return response; // Retorna a resposta do backend
 
@@ -49,10 +75,11 @@ export default class PessoaRepository {
     }
   }
 
-  async updatePessoa(Id: number, form: IPessoa) {
+  async updatePessoa(Id: number, form: IPessoaRequest) {
     try {
-      const baseRoute = this.pessoaRoutes.update(Id);
-      const response = await api.put(baseRoute, form);
+      const baseRoute = this.createBaseRoute()
+      form.Id = Id;
+      const response = await this.apiClient.put(`${baseRoute}/${Id}`, form);
 
       return response;
 
@@ -64,8 +91,8 @@ export default class PessoaRepository {
 
   async deletePessoa(Id: number) {
     try {
-      const baseRoute = this.pessoaRoutes.delete(Id);
-      const response = await api.delete(baseRoute);
+      const deleteRoute = this.createDeleteRoute(Id)
+      const response = await this.apiClient.delete(deleteRoute)
 
       return response;
 
@@ -75,9 +102,21 @@ export default class PessoaRepository {
     }
   }
 
+  getCargoAtual(historicosCargo: IHistoricoCargo[]): string {
+    const ultimoCargo = historicosCargo
+      .filter((historicosCargo) => !historicosCargo.DataFim)
+      .sort(
+        (a, b) =>
+          new Date(b.DataInicio).getTime() - new Date(a.DataInicio).getTime()
+      );
+
+    return ultimoCargo[0]?.Cargo.Nome || "Sem cargo";
+  }
+
+  /*
   async getHistoricosCargo(Id: number): Promise<IHistoricoCargo[]> {
     try {
-      const baseRoute = this.pessoaRoutes.getById(Id)
+      const baseRoute = this.createBaseRoute()
       const response = await api.get<IPessoa>(baseRoute);
 
       return response.data.HistoricosCargo ?? [];
@@ -87,4 +126,6 @@ export default class PessoaRepository {
       throw Error;
     }
   }
+  */
+
 }

@@ -1,33 +1,37 @@
-class PessoaRoutes {
-  private readonly name: string;
+import type { BaseConfig } from './BaseConfig'
 
-  constructor() {
-    this.name = 'pessoa';
+class PessoaRoutes {
+  protected config: BaseConfig
+  protected name: string
+
+  constructor(config: BaseConfig) {
+    this.config = config
+    this.name = 'Pessoa'
   };
 
   // GET
-  getAll(): string {
-    return `${this.name}`;
+  get getAll(): string {
+    return `${this.name}`
   };
 
   // GET by ID
-  getById(id: number): string {
-    return `${this.name}/${id}`;
+  get getById(): string {
+    return `${this.name}/${this.config.id}`
   };
 
   // POST
-  post(): string {
-      return `${this.name}`;
+  get post(): string {
+    return `${this.name}`
   };
 
   // PUT
-  update(id: number): string {
-    return `${this.name}/${id}`;
+  get update(): string {
+    return `${this.name}/${this.config.id}`
   };
 
   // DELETE
-  delete(id: number): string {
-    return `${this.name}/${id}`;
+  get delete(): string {
+    return `${this.name}/${this.config.id}`
   };
 };
 

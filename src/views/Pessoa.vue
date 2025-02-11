@@ -1,109 +1,60 @@
 <script setup lang="ts">
   import { ref, onMounted } from 'vue';
-  import type { IPessoa } from '../models/Entities/Pessoa';
-  import { Pessoa } from '../models/Entities/Pessoa';
+  import type { IPessoaRequest, IPessoaResponse } from '../models/Entities/Pessoa';
   import GenericSnackbar from '../components/GenericSnackbar.vue';
   import PessoaController from '../controllers/PessoaController';
-  import type { IHistoricoCargo } from './models/Entities/HistoricoCargo';
+  import type { IHistoricoCargo } from '../models/Entities/HistoricoCargo';
 
-  const pessoaController = new PessoaController();
+  // Estados reativos
+  const loading = ref(false);
+  const pessoas = ref<IPessoaResponse[]>([]);
 
-  const snackbar = ref(false);
-  const mensagemSnackbar = ref('');
-  const corSnackbar = ref('');
+  // Cabeçalhos da tabela
+  const headers = [
+    { title: 'ID', key: 'Id' },
+    { title: 'Nome', key: 'Nome' },
+    { title: 'Email', key: 'Email' },
+    { title: 'Telefone', key: 'Telefone' },
+    { title: 'CPF', key: 'Cpf' },
+    { title: 'Cargo', key: 'CargoNome' },
+    { title: 'Bolsa', key: 'BolsaNome' },
+    { title: 'Ações', key: 'actions', sortable: false }
+  ];
 
-  const pessoas = ref<IPessoa[]>([]);
-  const historicos = ref<IHistoricoCargo[]>([]);
-
-  const dialog = ref(false);
-
-
-  function snackbarSuccess(mensagem?: string) {
-    corSnackbar.value = 'success';
-    snackbar.value = true;
-    mensagemSnackbar.value = mensagem || 'Ação concluída com sucesso!';
-  }
-
-  function snackbarError(mensagem?: string) {
-    corSnackbar.value = 'error';
-    snackbar.value = true;
-    mensagemSnackbar.value = mensagem || 'Ocorreu um erro!';
-  }
-
-
-  const carregarPessoas = async () => {
-    pessoas.value = await pessoaController.getAll();
-  }
-
-
-  const cadastrarPessoa = () => {
-    pessoaSelecionada.value = new Pessoa(0, '', '', '', '', undefined, undefined);
-    dialog.value = true;
-  };
-
-  const criarPessoa = async () => {
+  // Função para carregar as pessoas
+  async function carregarPessoas() {
+    loading.value = true;
+    const controller = new PessoaController();
     try {
-      await pessoaController.create(pessoaSelecionada.value);
-      snackbarSuccess('Pessoa criada com sucesso!');
-      dialog.value = false;
-      await carregarPessoas();
+      pessoas.value = await controller.getAll();
     } catch (error) {
-      console.error('Erro ao criar pessoa:', error);
-      snackbarError();
+      console.error('Erro ao carregar pessoas:', error);
+    } finally {
+      loading.value = false;
     }
   }
 
-  const editarPessoa = (pessoa: IPessoa) => {
-    pessoaSelecionada.value = { ...pessoa };
-    dialog.value = true;
+  // Função para editar uma pessoa
+  async function editarPessoa(id: number) {
+    console.log('Editar pessoa com ID:', id);
+    // Implemente a lógica de edição aqui
   }
 
-  const atualizarPessoa = async () => {
-    try {
-      if (pessoaSelecionada.value.Id) {
-        await pessoaController.update(pessoaSelecionada.value.Id, pessoaSelecionada.value);
-        snackbarSuccess('Pessoa atualizada com sucesso!');
-        dialog.value = false;
-        await carregarPessoas();
+  // Função para deletar uma pessoa
+  async function deletarPessoa(id: number) {
+    const confirmacao = confirm('Tem certeza que deseja deletar esta pessoa?');
+    if (confirmacao) {
+      const controller = new PessoaController();
+      try {
+        await controller.delete(id);
+        await carregarPessoas(); // Recarrega a lista após deletar
+      } catch (error) {
+        console.error('Erro ao deletar pessoa:', error);
       }
-    } catch (error) {
-      console.error('Erro ao atualizar pessoa:', error);
-      snackbarError();
     }
   }
 
-  const excluirPessoa = async (id: number) => {
-    if (confirm('Deseja realmente excluir esta pessoa?')) {
-      await pessoaController.delete(id);
-      await carregarPessoas();
-    }
-  }
-
-  const pessoaSelecionada = ref<IPessoa>(
-    new Pessoa(0, '', '', '', '', undefined, undefined)
-  );
-
-  async function abrirDialog(pessoaId: number) {
-    await carregarHistoricos(pessoaId);
-    dialog.value = true;
-  }
-
-  const rules = {
-    required: (v: any) => (
-      v === null || v === undefined || v === '' ? 'Campo obrigatório' : true
-    )
-  }
-
-
-  async function carregarHistoricos(pessoaId: number) {
-    try {
-      historicos.value = await pessoaController.getHistoricosCargo(pessoaId);
-    } catch (error) {
-      console.error("Erro ao buscar históricos de cargo:", error);
-    };
-  }
-
-
+  // Carrega as pessoas quando o componente é montado
   onMounted(() => {
     carregarPessoas();
   });
@@ -113,122 +64,24 @@
 <template>
   <v-container>
     <v-card>
-      <v-card-title>
-        <span class="text-h5">Gerenciamento de Pessoas</span>
-        <v-spacer></v-spacer>
-        <v-btn color="primary" @click="cadastrarPessoa">Cadastrar Pessoa</v-btn>
-      </v-card-title>
-
-      <v-data-table :headers="[
-        { title: 'Nome', key: 'Nome' },
-        { title: 'CPF', key: 'CPF' },
-        { title: 'Email', key: 'Email' },
-        { title: 'Telefone', key: 'Telefone' },
-        { title: 'Bolsa', key: 'Bolsa' },
-        { title: 'Ações', key: 'acoes', sortable: false },
-      ]" :items="pessoas" class="elevation-1">
-        <template v-slot:item="{ item }">
-          <tr>
-            <td>{{ item.Nome }}</td>
-            <td>{{ item.Cpf }}</td>
-            <td>{{ item.Email }}</td>
-            <td>{{ item.Telefone }}</td>
-            <td>{{ item.Bolsa }}</td>
-            <td style="display: flex; gap: 0.5rem; align-items: center;">
-              <v-btn icon color="green" size="small" @click="carregarHistoricos(item.Id)">
-                <v-icon>mdi-history</v-icon>
-              </v-btn>
-
-              <!-- Modal para exibir históricos -->
-              <v-dialog v-model="dialog" max-width="500">
-                <v-card>
-                  <v-card-title>Históricos de Cargos</v-card-title>
-                  <v-card-text>
-                    <ul v-if="historicos.length > 0">
-                      <li v-for="historico in historicos" :key="historico.Id">
-                        Cargo: {{ historico.Cargo }} - De: {{ historico.DataInicio }} até {{ historico.DataFim }}
-                      </li>
-                    </ul>
-                    <p v-else>Nenhum histórico encontrado.</p>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-btn color="red" @click="dialog = false">Fechar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-
-              <v-btn icon color="blue" size="small" @click="editarPessoa(item)">
-                <v-icon>mdi-pencil</v-icon>
-              </v-btn>
-              <v-btn icon color="red" size="small" @click="excluirPessoa(item.Id)">
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </td>
-          </tr>
+      <v-data-table
+        :headers="headers"
+        :items="pessoas"
+        :loading="loading"
+        loading-text="Carregando... Aguarde"
+        no-data-text="Nenhuma pessoa encontrada"
+      >
+        <template v-slot:item.actions="{ item }">
+          <v-icon small class="mr-2" @click="editarPessoa(item.Id)">
+            mdi-pencil
+          </v-icon>
+          <v-icon small @click="deletarPessoa(item.Id)">
+            mdi-delete
+          </v-icon>
         </template>
       </v-data-table>
     </v-card>
-
-    <v-dialog v-model="dialog">
-      <v-card>
-        <v-card-title>
-          <span class="text-h5"> {{ pessoaSelecionada.Id ? 'Editar Pessoa' : 'Cadastrar Pessoa' }}</span>
-        </v-card-title>
-
-        <v-card-text>
-          <v-form>
-            <!-- Nome -->
-            <label class="required-label">Nome</label>
-            <v-text-field
-              v-model="pessoaSelecionada.Nome"
-              :rules="[rules.required]"
-              class="mb-4"
-              outlined
-            ></v-text-field>
-
-            <!-- Email -->
-            <label class="required-label">Email</label>
-            <v-text-field
-              v-model="pessoaSelecionada.Email"
-              :rules="[rules.required]"
-              class="mb-4"
-              outlined
-            ></v-text-field>
-
-            <!-- Telefone -->
-            <label class="required-label">Telefone</label>
-            <v-text-field
-              v-model="pessoaSelecionada.Telefone"
-              :rules="[rules.required]"
-              class="mb-4"
-              outlined
-            ></v-text-field>
-
-            <!-- CPF -->
-            <label class="required-label">CPF</label>
-            <v-text-field
-              v-model="pessoaSelecionada.Cpf"
-              :rules="[rules.required]"
-              class="mb-4"
-              outlined
-            ></v-text-field>
-          </v-form>
-        </v-card-text>
-
-      <v-card-actions>
-          <v-btn color="red" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="green" @click="criarPessoa">Salvar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
-
-  <GenericSnackbar
-    v-model="snackbar"
-    :text="mensagemSnackbar"
-    :color="corSnackbar"
-    :timeout="3000"
-  />
 </template>
 
 <style scoped>
