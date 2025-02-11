@@ -1,5 +1,5 @@
 import api from '@/api/api';
-import type { IPessoaResponse, IPessoaRequest } from '../Entities/Pessoa';
+import { type IPessoaResponse, type IPessoaRequest, PessoaResponse } from '../Entities/Pessoa';
 import PessoaRoutes from '../ApiRoutes/PessoaRoutes';
 import { type IHistoricoCargo } from '../Entities/HistoricoCargo';
 
@@ -23,30 +23,26 @@ export default class PessoaRepository {
       const baseRoute = this.createBaseRoute();
 
       // Faz a request usando a API com o axios
-      const response = await this.apiClient.get(baseRoute)
-
-      console.log("Resposta bruta da API:\n\n\n\n", response.data);
-
-      if (!Array.isArray(response.data.$values)) {
-        throw new Error("Formato de dados inválido: esperado um array de pessoas.");
-      }
+      const response = await this.apiClient.get(baseRoute);
 
       // Retorna a função com a criação de objetos
-      return response.data.$values.map((pessoa: IPessoaResponse) => {
-        const { Id, Nome, Email, Telefone, Cpf, CargoNome, BolsaNome, HistoricosCargo } = pessoa;
+      return response.data.$values.map((pessoa: any) => {
+        const { HistoricosCargo } = pessoa;
 
         const cargoAtual = HistoricosCargo ? this.getCargoAtual(HistoricosCargo) : "Sem cargo";
 
-        return {
+        return new PessoaResponse(
           pessoa.id,
           pessoa.nome,
-          email,
-          telefone,
-          cpf,
-          cargoNome: cargoAtual,
-          bolsaNome,
-          historicosCargo
-        };
+          pessoa.email,
+          pessoa.telefone,
+          pessoa.cpf,
+          cargoAtual,
+          pessoa.Bolsa.Nome,
+          HistoricosCargo
+        )
+
+
       });
 
     } catch (error) {
