@@ -2,16 +2,22 @@
   import { ref, onMounted } from 'vue';
   import type { IFinanciador } from '../models/Entities/Financiador';
   import { Financiador } from '../models/Entities/Financiador';
-  import GenericSnackbar from '../components/GenericSnackbar.vue';
   import FinanciadorController from '../controllers/FinanciadorController';
+  import GenericSnackbar from '../components/GenericSnackbar.vue';
+  import type { IProjeto } from '../models/Entities/Projeto';
+  import { Projeto } from '../models/Entities/Projeto';
+  import ProjetoController from '../controllers/ProjetoController';
+  
 
   const financiadorController = new FinanciadorController();
+  const projetoController = new ProjetoController();
 
   const snackbar = ref(false);
   const mensagemSnackbar = ref('');
   const corSnackbar = ref('');
 
   const financiadores = ref<IFinanciador[]>([]);
+  const projetos = ref<IProjeto[]>([]);
 
   const dialog = ref(false);
 
@@ -32,6 +38,11 @@
   const carregarFinanciadores = async () => {
     financiadores.value = await financiadorController.getAll();
   }
+
+  const carregarProjetos = async () => {
+  projetos.value = await projetoController.getAll()
+  }
+
 
 
   const cadastrarFinanciador = () => {
@@ -72,6 +83,15 @@
 
   const excluirFinanciador = async (Id: number) => {
     if (confirm('Deseja realmente excluir este financiador?')) {
+      await carregarProjetos();
+
+      const existeProjetoAssociado = projetos.value.some(p => p.financiadorId === Id);
+
+      if (existeProjetoAssociado) {
+      alert('Este financiador não pode ser excluído porque está associado a um ou mais projetos.');
+      return;
+      }
+
       await financiadorController.delete(Id);
       await carregarFinanciadores();
     }
