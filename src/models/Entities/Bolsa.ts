@@ -1,9 +1,40 @@
 import { Escolaridade } from './Enums/Escolaridade';
 
+export interface IBolsaRequest {
+  id: number;
+  nome: string;
+  planoTrabalho: string;
+  valor: number;
+  dataInicio: Date | string;
+  dataFim: Date | string | null;
+  dataPrevistaFim: Date | string;
+  ativo: boolean;
+  pessoaId: number;
+  projetoId: number;
+  escolaridade: number;
+}
+
+export class BolsaRequest implements IBolsaRequest {
+  public constructor(
+    public id: number,
+    public nome: string,
+    public planoTrabalho: string,
+    public valor: number,
+    public dataInicio: Date | string,
+    public dataFim: Date | string | null,
+    public dataPrevistaFim: Date | string,
+    public ativo: boolean,
+    public pessoaId: number,
+    public projetoId: number,
+    public escolaridade: number
+  ) {}
+}
+
+
 // Bolsa.ts
 export interface IBolsa {
     Id: number;
-    Nome: number | null;
+    Nome: string;
     PlanoTrabalho: string;
     Valor: number;
     DataInicio: Date | string;
@@ -20,9 +51,9 @@ export interface IBolsa {
   export class Bolsa implements IBolsa {
     public constructor (
       public Id: number,
-      public Valor: number,
-      public Nome: number | null,
+      public Nome: string,
       public PlanoTrabalho: string,
+      public Valor: number,
       public DataInicio: Date | string,
       public DataFim: Date | string | null,
       public DataPrevistaFim: Date | string,
