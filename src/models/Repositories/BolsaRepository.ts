@@ -1,5 +1,5 @@
 import api from '@/api/api';
-import type { IBolsa } from '../Entities/Bolsa';
+import type { IBolsa, IBolsaRequest } from '../Entities/Bolsa';
 import { Bolsa } from '../Entities/Bolsa';
 import BolsaRoutes from '../ApiRoutes/BolsaRoutes';
 
@@ -49,7 +49,7 @@ export default class BolsaRepository {
   }
 
 
-  async createBolsa(form: IBolsa) {
+  async createBolsa(form: IBolsaRequest) {
     try {
       // Criar rota de conexão
       const baseRoute = this.createBaseRoute();
@@ -65,13 +65,13 @@ export default class BolsaRepository {
     }
   }
 
-  async updateBolsa(id: number, form: IBolsa) {
+  async updateBolsa(id: number, form: IBolsaRequest) {
     try {
       // Criar rota de conexão
       const baseRoute = this.createBaseRoute();
 
       // Garante que o Id está salvo dentro do form
-      form.Id = id;
+      form.id = id;
 
       // Faz o put usando a API com axios e enviando os dados
       const response = await this.apiClient.put(`${baseRoute}/${id}`, form);
