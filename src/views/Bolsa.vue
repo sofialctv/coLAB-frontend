@@ -1,49 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import BolsaController from '../controllers/BolsaController';
-import type { IBolsa } from '../Models/Entities/Bolsa';
-import { Bolsa } from '../Models/Entities/Bolsa';
+import type { IBolsa } from '../models/Entities/Bolsa';
+import type { IPessoaResponse } from '../models/Entities/Pessoa';
+import type { IProjeto } from '../models/Entities/Projeto';
+import { Bolsa } from '../models/Entities/Bolsa';
+import { Escolaridade } from '../models/Entities/Enums/Escolaridade';
 import GenericSnackbar from '../components/GenericSnackbar.vue';
 import PessoaController from '../controllers/PessoaController';
-import TipoBolsaController from '../controllers/TipoBolsaController';
 import ProjetoController from '../controllers/ProjetoController';
+import { toRaw } from "vue";
 
-const tiposBolsa = ref([]); // Lista de tipos de bolsa existentes
-const novoTipoBolsa = ref(''); // Novo tipo de bolsa (caso queira criar)
-const isNovoTipoBolsa = ref(false); // Flag para exibir o campo de novo tipo
-
-// Função para carregar os tipos de bolsa
-const carregarTiposBolsa = async () => {
-  // Supondo que você tenha um controller para gerenciar os tipos de bolsa
-  tiposBolsa.value = await TipoBolsaController.getAll();
-};
-
-// Função para verificar se é novo tipo de bolsa
-const handleTipoBolsaChange = (tipoBolsaId: any) => {
-  if (!tipoBolsaId) {
-    isNovoTipoBolsa.value = true;
-  } else {
-    isNovoTipoBolsa.value = false;
-  }
-};
-
-// Função para criar novo tipo de bolsa
-const criarNovoTipoBolsa = async () => {
-  if (novoTipoBolsa.value) {
-    try {
-      const tipoBolsaCriado = await tipoBolsaController.create({ descricao: novoTipoBolsa.value });
-      tiposBolsa.value.push(tipoBolsaCriado); // Adiciona o novo tipo à lista
-      bolsaSelecionada.value.TipoBolsa = tipoBolsaCriado.id; // Associa o novo tipo à bolsa
-      snackbarSuccess('Novo tipo de bolsa criado com sucesso!');
-    } catch (error) {
-      snackbarError('Erro ao criar tipo de bolsa');
-    }
-  }
-};
-
-onMounted(() => {
-  carregarTiposBolsa(); // Carrega os tipos de bolsa existentes ao montar o componente
-});
 
 const snackbar = ref(false);
 const mensagemSnackbar = ref('');
@@ -72,19 +39,52 @@ const bolsaController = new BolsaController();
 
 // Listas
 const bolsas = ref<IBolsa[]>([]);
-const pessoas = ref<IPessoa[]>([]);
+const pessoas = ref<IPessoaResponse[]>([]);
 const projetos = ref<IProjeto[]>([]);
 
 // Estado do modal e bolsa editável
 const dialog = ref(false);
+// Correção da instância de bolsaSelecionada
 const bolsaSelecionada = ref<IBolsa>(
-  new Bolsa(0, 0, new Date(), new Date(), true, null, null, null, new Date())
+  new Bolsa(
+    0,                   // Id
+    0,                   // Valor
+    null,                // Nome (número ou null)
+    "",                  // PlanoTrabalho
+    new Date(),          // DataInicio
+    new Date(),          // DataFim
+    new Date(),          // DataPrevistaFim
+    true,                // Ativo
+    null,                // PessoaId
+    "",                  // PessoaNome
+    null,                // ProjetoId
+    "",                  // ProjetoNome
+    Escolaridade.Tecnico // Escolaridade
+  )
 );
 
+
+
 // Carregar dados ao iniciar
+
+
 const carregarBolsas = async () => {
   bolsas.value = await bolsaController.getAll();
+
+  console.log("Dados recebidos:", toRaw(bolsas.value)); // Verifica os dados sem Proxy
+  console.log("Tipo de bolsas.value:", typeof bolsas.value);
+
+  if (Array.isArray(toRaw(bolsas.value)) && bolsas.value.length > 0) {
+    const primeiraBolsa = toRaw(bolsas.value[0]);
+    console.log("Primeiro item:", primeiraBolsa);
+    console.log("Chaves do primeiro item:", Object.keys(primeiraBolsa));
+    console.log("Nome:", primeiraBolsa.Nome); // Agora pode funcionar
+  } else {
+    console.log("A lista de bolsas está vazia ou não é um array.");
+  }
 };
+
+
 
 const carregarPessoas = async () => {
   pessoas.value = await pessoaController.getAll();
@@ -102,7 +102,21 @@ onMounted(() => {
 
 // Abrir modal para adicionar nova bolsa
 const abrirNovaBolsa = () => {
-  bolsaSelecionada.value = new Bolsa(0, 0, new Date(), new Date(), true, null, null, null, new Date());
+  bolsaSelecionada.value = new Bolsa(
+    0,                   // Id
+    0,                   // Valor
+    null,                // Nome (número ou null)
+    "",                  // PlanoTrabalho
+    new Date(),          // DataInicio
+    new Date(),          // DataFim
+    new Date(),          // DataPrevistaFim
+    true,                // Ativo
+    null,                // PessoaId
+    "",                  // PessoaNome
+    null,                // ProjetoId
+    "",                  // ProjetoNome
+    Escolaridade.Tecnico // Escolaridade
+  );
   dialog.value = true;
 };
 
@@ -183,8 +197,11 @@ const excluirBolsa = async (Id: number) => {
       <!-- Tabela de Bolsas -->
       <v-data-table
         :headers="[
-          { title: 'Tipo', key: 'TipoBolsaNome' },
+          { title: 'Nome', key: 'Nome' },
+          { title: 'Plano de Trabalho', key: 'PlanoTrabalho' },
+          { title: 'Pessoa', key: 'PessoaNome' },
           { title: 'Data Início', key: 'DataInicio' },
+          { title: 'Data Fim', key: 'DataFim' },
           { title: 'Data prevista de Fim', key: 'DataPrevistaFim' },
           { title: 'Está ativa?', key: 'Ativo' },
           { title: 'Ações', key: 'acoes', sortable: false }
@@ -194,8 +211,11 @@ const excluirBolsa = async (Id: number) => {
       >
         <template v-slot:item="{ item }">
           <tr>
-            <td>  {{ item.TipoBolsaNome }}  </td>
+            <td>  {{ item.Nome }} </td>
+            <td>  {{ item.PlanoTrabalho }} </td>
+            <td>  {{ item.PessoaNome }} </td>
             <td>  {{ item.DataInicio }} </td>
+            <td>  {{ item.DataFim }} </td>
             <td>  {{ item.DataPrevistaFim }}  </td>
             <td>  {{ item.Ativo ? 'Sim' : 'Não' }}  </td>
             <td style="display: flex; gap: 0.5rem; align-items: center;">
@@ -220,30 +240,7 @@ const excluirBolsa = async (Id: number) => {
 
         <v-card-text>
           <v-form>
-            <!-- TipoBolsa -->
-
-            <label class="required-label">TipoBolsa</label>
-            <v-select
-              v-model="bolsaSelecionada.TipoBolsa"
-              :items="tiposBolsa"
-              item-title="descricao"
-              item-value="id"
-              label="Selecione ou crie um tipo de bolsa"
-              @change="handleTipoBolsaChange"
-              class="mb-4"
-              outlined
-            ></v-select>
-            <v-text-field
-              v-if="isNovoTipoBolsa"
-              v-model="novoTipoBolsa"
-              label="Novo Tipo de Bolsa"
-              outlined
-              class="mb-4"
-              @blur="criarNovoTipoBolsa"
-            />
-
-
-            <!-- Seleção múltipla de Pessoas -->
+          <!-- Seleção múltipla de Pessoas -->
             <label class="required-label">Pessoas</label>
             <v-select
               v-model="bolsaSelecionada.PessoaId"

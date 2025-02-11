@@ -11,10 +11,5 @@ export class HistoricoStatus implements IHistoricoStatus {
     public dataInicio: Date,
     public dataFim: Date,
     public statusDescricao: string,
-  ) {
-    this.status = status
-    this.dataInicio = dataInicio
-    this.dataFim = dataFim
-    this.statusDescricao = statusDescricao
-  }
+  ) {}
 }

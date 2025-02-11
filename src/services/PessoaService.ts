@@ -1,5 +1,5 @@
 import PessoaRepository from '../models/Repositories/PessoaRepository';
-import type { IPessoa } from '../models/Entities/Pessoa';
+import type { IPessoaResponse, IPessoaRequest } from '../models/Entities/Pessoa';
 import type { IHistoricoCargo } from '../models/Entities/HistoricoCargo';
 
 export default class PessoaService {
@@ -9,30 +9,59 @@ export default class PessoaService {
     this.pessoaRepository = new PessoaRepository();
   }
 
-  async getAll(): Promise<IPessoa[]> {
-    return await this.pessoaRepository.fetchPessoa_s();
+  async getAll(): Promise<IPessoaResponse[]> {
+    try {
+      return await this.pessoaRepository.fetchPessoa_s();
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao buscar pessoas.");
+    }
   }
 
-  async create(form: IPessoa) {
-    if (!form.Nome || !form.Email) {
-      throw new Error("Nome e Email são obrigatórios.");
+  async create(form: IPessoaRequest) {
+
+    try {
+      if (!form.Nome || !form.Email) {
+        throw new Error("Nome e Email são obrigatórios.");
+      }
+      return await this.pessoaRepository.createPessoa(form);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao criar pessoa.");
     }
-    return await this.pessoaRepository.createPessoa(form);
+
   }
 
-  async update(Id: number, form: IPessoa) {
-    const pessoaExiste = await this.pessoaRepository.fetchPessoa_s();
-    if (!pessoaExiste.find(p => p.Id === Id)) {
-      throw new Error("Pessoa não encontrada.");
+  async update(Id: number, form: IPessoaRequest) {
+    try {
+      const pessoaExiste = await this.pessoaRepository.fetchPessoa_s();
+      if (!pessoaExiste.find(p => p.Id === Id)) {
+        throw new Error("Pessoa não encontrada.");
+      }
+      return await this.pessoaRepository.updatePessoa(Id, form);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao atualizar pessoa.");
     }
-    return await this.pessoaRepository.updatePessoa(Id, form);
+
   }
 
   async delete(Id: number) {
-    return await this.pessoaRepository.deletePessoa(Id);
+    try {
+      return await this.pessoaRepository.deletePessoa(Id);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao deletar pessoa.");
+
+    }
+
   }
 
+  /*
   async getHistoricosCargo(Id: number): Promise<IHistoricoCargo[]> {
     return await this.pessoaRepository.getHistoricosCargo(Id);
   }
+  */
+
+
 }

@@ -1,25 +1,25 @@
-import type { IProjeto } from '../models/Entities/Projeto'
-import ProjetoRepository from '../models/Repositories/ProjetoRepository'
+import type { IBolsa } from '../models/Entities/Bolsa'
+import BolsaRepository from '../models/Repositories/BolsaRepository'
 
-export default class ProjetoController {
-  projetoRepository
+export default class BolsaController {
+  bolsaRepository
   constructor() {
-    this.projetoRepository = new ProjetoRepository()
+    this.bolsaRepository = new BolsaRepository()
   }
 
   async getAll() {
-    return await this.projetoRepository.fetchAllProjeto()
+    return await this.bolsaRepository.fetchAllBolsa()
   }
 
-  async create(form: IProjeto) {
-    return await this.projetoRepository.createProjeto(form)
+  async create(form: IBolsa) {
+    return await this.bolsaRepository.createBolsa(form)
   }
 
-  async update(id: number, form: IProjeto) {
-    return await this.projetoRepository.updateProjeto(id, form)
+  async update(id: number, form: IBolsa) {
+    return await this.bolsaRepository.updateBolsa(id, form)
   }
 
   async delete(id: number) {
-    return await this.projetoRepository.deleteProjeto(id)
+    return await this.bolsaRepository.deleteBolsa(id)
   }
 }
