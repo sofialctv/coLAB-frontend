@@ -4,7 +4,7 @@ import BolsaController from '../controllers/BolsaController';
 import type { IBolsa } from '../models/Entities/Bolsa';
 import type { IPessoaResponse } from '../models/Entities/Pessoa';
 import type { IProjeto } from '../models/Entities/Projeto';
-import { Bolsa } from '../models/Entities/Bolsa';
+import { Bolsa, BolsaRequest } from '../models/Entities/Bolsa';
 import { Escolaridade } from '../models/Entities/Enums/Escolaridade';
 import GenericSnackbar from '../components/GenericSnackbar.vue';
 import PessoaController from '../controllers/PessoaController';
@@ -48,9 +48,9 @@ const dialog = ref(false);
 const bolsaSelecionada = ref<IBolsa>(
   new Bolsa(
     0,                   // Id
-    0,                   // Valor
-    null,                // Nome (número ou null)
+    "",                  // Nome
     "",                  // PlanoTrabalho
+    0,                   // Valor
     new Date(),          // DataInicio
     new Date(),          // DataFim
     new Date(),          // DataPrevistaFim
@@ -94,19 +94,28 @@ const carregarProjetos = async () => {
   projetos.value = await projetoController.getAll();
 };
 
+// Verificando se a tela é menor que 1164px
+const adjustDatesContainer = ref(false)
+
+const checkScreenSize = () => {
+  adjustDatesContainer.value = window.innerWidth <= 1264
+}
+
 onMounted(() => {
   carregarBolsas();
   carregarPessoas();
   carregarProjetos();
-});
+  checkScreenSize()
+  window.addEventListener('resize', checkScreenSize)
+})
 
 // Abrir modal para adicionar nova bolsa
 const abrirNovaBolsa = () => {
   bolsaSelecionada.value = new Bolsa(
     0,                   // Id
-    0,                   // Valor
-    null,                // Nome (número ou null)
+    "",                  // Nome
     "",                  // PlanoTrabalho
+    0,                   // Valor
     new Date(),          // DataInicio
     new Date(),          // DataFim
     new Date(),          // DataPrevistaFim
@@ -131,13 +140,24 @@ const formatarDataParaYYYYMMDD = (dataISO: string | Date) => {
   return data.toISOString().split('T')[0]; // Retorna a parte YYYY-MM-DD
 };
 
-const formatarDataParaDDMMYYYY = (dataISO: string | Date) => {
+const formatarDataParaDDMMYYYY = (dataISO: string | Date | null): string => {
+  if (!dataISO) {
+    return '';
+  }
   const data = new Date(dataISO);
-  const dia = String(data.getDate()).padStart(2, '0'); // Adiciona o zero à esquerda se necessário
-  const mes = String(data.getMonth() + 1).padStart(2, '0'); // Os meses em JavaScript começam do zero
-  const ano = data.getFullYear();
+
+  // Verifica se a data é válida
+  if (isNaN(data.getTime())) {
+    throw new Error("Data inválida");
+  }
+
+  const dia = String(data.getUTCDate()).padStart(2, "0");
+  const mes = String(data.getUTCMonth() + 1).padStart(2, "0");
+  const ano = data.getUTCFullYear();
+
   return `${dia}/${mes}/${ano}`;
 };
+
 
 
 // Abrir modal para edição
@@ -151,23 +171,49 @@ const editarBolsa = (bolsa: IBolsa) => {
   dialog.value = true;
 };
 
+const TransformarEmBolsaRequest = (bolsa: IBolsa): BolsaRequest => {
+  return new BolsaRequest(
+    bolsa.Id,
+    bolsa.Nome,
+    bolsa.PlanoTrabalho,
+    bolsa.Valor,
+    bolsa.DataInicio,
+    bolsa.DataFim,
+    bolsa.DataPrevistaFim,
+    bolsa.Ativo,
+    Number(bolsa.PessoaId),
+    Number(bolsa.ProjetoId),
+    bolsa.Escolaridade
+  );
+};
+
+
 // Salvar bolsa (criação ou edição)
+
 const salvarBolsa = async () => {
   try {
-    // Certifique-se de que as datas estão no formato correto ao salvar
+    console.log("Dados antes da formatação:", toRaw(bolsaSelecionada.value));
+
+    // Formatar datas antes de enviar
     bolsaSelecionada.value.DataInicio = formatarDataParaISO(bolsaSelecionada.value.DataInicio);
     bolsaSelecionada.value.DataPrevistaFim = formatarDataParaISO(bolsaSelecionada.value.DataPrevistaFim);
     bolsaSelecionada.value.DataFim = bolsaSelecionada.value.DataFim
       ? formatarDataParaISO(bolsaSelecionada.value.DataFim)
       : null;
 
-    if (bolsaSelecionada.value.Id) {
-      await bolsaController.update(bolsaSelecionada.value.Id, bolsaSelecionada.value);
+    const bolsaRequest = TransformarEmBolsaRequest(bolsaSelecionada.value);
+
+    console.log("Dados sendo enviados:", toRaw(bolsaRequest));
+
+    // Verificar se a bolsa já existe (tem ID)
+    if (bolsaRequest.id) {
+      await bolsaController.update(bolsaRequest.id, bolsaRequest);
       snackbarSuccess('Bolsa atualizada com sucesso!');
     } else {
-      await bolsaController.create(bolsaSelecionada.value);
+      await bolsaController.create(bolsaRequest);
       snackbarSuccess('Bolsa criada com sucesso!');
     }
+
     dialog.value = false;
     await carregarBolsas();
   } catch (error) {
@@ -175,6 +221,8 @@ const salvarBolsa = async () => {
     snackbarError('Erro ao salvar bolsa.');
   }
 };
+
+
 
 
 // Excluir bolsa
@@ -208,9 +256,10 @@ const excluirBolsa = async (Id: number) => {
           { title: 'Nome', key: 'Nome' },
           { title: 'Plano de Trabalho', key: 'PlanoTrabalho' },
           { title: 'Pessoa', key: 'PessoaNome' },
+          { title: 'Projeto', key: 'ProjetoNome' },
           { title: 'Data Início', key: 'DataInicio' },
-          { title: 'Data Fim', key: 'DataFim' },
           { title: 'Data prevista de Fim', key: 'DataPrevistaFim' },
+          { title: 'Data Fim', key: 'DataFim' },
           { title: 'Está ativa?', key: 'Ativo' },
           { title: 'Ações', key: 'acoes', sortable: false }
         ]"
@@ -222,9 +271,10 @@ const excluirBolsa = async (Id: number) => {
             <td>  {{ item.Nome }} </td>
             <td>  {{ item.PlanoTrabalho }} </td>
             <td>  {{ item.PessoaNome }} </td>
+            <td> {{ item.ProjetoNome}} </td>
             <td>  {{ formatarDataParaDDMMYYYY(item.DataInicio) }} </td>
-            <td>  {{ formatarDataParaDDMMYYYY(item.DataFim) }} </td>
             <td>  {{ formatarDataParaDDMMYYYY(item.DataPrevistaFim) }}  </td>
+            <td>  {{ formatarDataParaDDMMYYYY(item.DataFim) }} </td>
             <td>  {{ item.Ativo ? 'Sim' : 'Não' }}  </td>
             <td style="display: flex; gap: 0.5rem; align-items: center;">
               <v-btn icon color="blue" size="small" @click="editarBolsa(item)">
@@ -248,16 +298,35 @@ const excluirBolsa = async (Id: number) => {
 
         <v-card-text>
           <v-form>
-          <!-- Seleção múltipla de Pessoas -->
+            <!-- Nome -->
+            <label class="required-label">Nome</label>
+            <v-text-field
+              v-model="bolsaSelecionada.Nome"
+              :rules="[rules.required]"
+              class="mb-4"
+              outlined
+              ></v-text-field>
+            
+            <!-- Plano de trabalho -->
+            <label class="required-label">Plano de Trabalho</label>
+            <v-text-field
+              v-model="bolsaSelecionada.PlanoTrabalho"
+              :rules="[rules.required]"
+              class="mb-4"
+              outlined
+              ></v-text-field>
+
+            <!-- Pessoas -->
             <label class="required-label">Pessoas</label>
             <v-select
               v-model="bolsaSelecionada.PessoaId"
               :items="pessoas"
+              :rules="[rules.required]"
               item-title="Nome"
               item-value="Id"
-              multiple
               class="mb-4"
               outlined
+              :clearable="true"
             ></v-select>
 
             <!-- Projeto -->
