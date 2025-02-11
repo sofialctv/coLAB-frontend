@@ -26,11 +26,11 @@ export default class FinanciadorRepository {
       const response = await this.apiClient.get(baseRoute)
 
       // Retorna a função com a criação de objetos
-      return response.data.$values.map((item: IFinanciador) => {
+      return response.data.$values.map((item: any) => {
         return new Financiador(
-          item.Id,
-          item.Nome,
-          item.Email,
+          item.id,
+          item.nome,
+          item.email,
         )
       })
 
