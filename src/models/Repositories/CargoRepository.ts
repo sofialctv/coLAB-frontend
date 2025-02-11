@@ -4,37 +4,50 @@ import { Cargo } from '../Entities/Cargo';
 import CargoRoutes from '../ApiRoutes/CargoRoutes';
 
 export default class CargoRepository {
+  apiClient;
 
-  private cargoRoutes = new CargoRoutes();
+  constructor() {
+    this.apiClient = api;
+  };
 
-  // Se um ID for passado ele chama o getById, se não, chama o getAll
-  private createBaseRoute(Id?: number) : string {
-    return Id ? this.cargoRoutes.getById(Id) : this.cargoRoutes.getAll();
+  createBaseRoute() {
+    return new CargoRoutes({}).getAll;
   }
+
+  createDeleteRoute(id: number) {
+    return new CargoRoutes({ id: id }).delete;
+  };
 
   async fetchCargo_s() {
     try {
       const baseRoute = this.createBaseRoute();
-      const response = await api.get(baseRoute);
+      const response = await this.apiClient.get(baseRoute);
 
       // Retorna a função com a criação de objetos
-      return response.data.value.map((cargo: ICargo) =>
-        new Cargo (
-          cargo.Id,
-          cargo.Nome,
-          cargo.Descricao
-        ));
+      return response.data.$value.map((cargo: any) => {
+        return new Cargo (
+          cargo.id,
+          cargo.nome,
+        );
+      });
 
     } catch (error) {
-      console.error("Erro ao buscar cargos.", error);
+      const err = error as any;
+      if (err.response) {
+        console.error("Erro na resposta da API:", err.response.status, err.response.data);
+      } else if (err.request) {
+        console.error("Erro na requisição:", err.request);
+      } else {
+        console.error("Erro ao configurar a requisição:", err.message);
+      }
       throw error;
     }
   }
 
   async createCargo(form: ICargo) {
     try {
-      const baseRoute = this.cargoRoutes.post();
-      const response = await api.post(baseRoute, form);
+      const baseRoute = this.createBaseRoute();
+      const response = await this.apiClient.post(baseRoute, form);
 
       return response; // Retorna a resposta do backend
 
@@ -46,8 +59,9 @@ export default class CargoRepository {
 
   async updateCargo(Id: number, form: ICargo) {
     try {
-      const baseRoute = this.cargoRoutes.update(Id);
-      const response = await api.put(baseRoute, form);
+      const baseRoute = this.createBaseRoute();
+      form.Id = Id;
+      const response = await this.apiClient.put(`${baseRoute}/${Id}`, form);
 
       return response;
 
@@ -59,8 +73,8 @@ export default class CargoRepository {
 
   async deleteCargo(Id: number) {
     try {
-      const baseRoute = this.cargoRoutes.delete(Id);
-      const response = await api.delete(baseRoute);
+      const deleteRoute = this.createDeleteRoute(Id);
+      const response = await this.apiClient.delete(deleteRoute);
 
       return response;
 

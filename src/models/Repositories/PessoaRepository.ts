@@ -1,7 +1,6 @@
 import api from '@/api/api';
-import { type IPessoaResponse, type IPessoaRequest, PessoaResponse } from '../Entities/Pessoa';
+import {  type IPessoaRequest, PessoaResponse } from '../Entities/Pessoa';
 import PessoaRoutes from '../ApiRoutes/PessoaRoutes';
-import { type IHistoricoCargo } from '../Entities/HistoricoCargo';
 
 export default class PessoaRepository {
   apiClient;
@@ -21,15 +20,12 @@ export default class PessoaRepository {
   async fetchPessoa_s() {
     try {
       const baseRoute = this.createBaseRoute();
+      const response = await this.apiClient.get(baseRoute); // Faz a request usando a API com o axios
 
-      // Faz a request usando a API com o axios
-      const response = await this.apiClient.get(baseRoute);
-
-      // Retorna a função com a criação de objetos
       return response.data.$values.map((pessoa: any) => {
-        const { HistoricosCargo } = pessoa;
+        const historicosCargoArray = pessoa.historicosCargo?.$values || [];
 
-        const cargoAtual = historicosCargo ? this.getCargoAtual(historicosCargo) : "Sem cargo";
+        const cargoAtual = historicosCargoArray ? this.getCargoAtual(historicosCargoArray) : "Sem cargo";
 
         return new PessoaResponse(
           pessoa.id,
@@ -38,11 +34,9 @@ export default class PessoaRepository {
           pessoa.telefone,
           pessoa.cpf,
           cargoAtual,
-          pessoa.Bolsa.Nome,
-          HistoricosCargo
-        )
-
-
+          pessoa.bolsaNome,
+          historicosCargoArray
+        );
       });
 
     } catch (error) {
@@ -98,15 +92,22 @@ export default class PessoaRepository {
     }
   }
 
-  getCargoAtual(historicosCargo: IHistoricoCargo[]): string {
-    const ultimoCargo = historicosCargo
-      .filter((historicosCargo) => !historicosCargo.DataFim)
+  getCargoAtual(historicosCargo: any[]): string {
+    if (!historicosCargo || !Array.isArray(historicosCargo)) {
+      return "Sem cargo";
+    }
+
+    const ultimoHistoricoCargo = historicosCargo
+      .filter(
+        (historicosCargo) =>
+          !historicosCargo.data_fim || historicosCargo.data_fim === "0001-01-01T00:00:00"
+      )
       .sort(
         (a, b) =>
-          new Date(b.DataInicio).getTime() - new Date(a.DataInicio).getTime()
+          new Date(b.data_inicio).getTime() - new Date(a.data_inicio).getTime()
       );
 
-    return ultimoCargo[0]?.Cargo.Nome || "Sem cargo";
+    return ultimoHistoricoCargo[0]?.cargoNome || "Sem cargo";
   }
 
   /*

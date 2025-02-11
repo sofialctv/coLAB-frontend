@@ -9,25 +9,42 @@ export default class CargoService {
   }
 
   async getAll(): Promise<ICargo[]> {
-    return await this.cargoRepository.fetchCargo_s();
+    try {
+      return await this.cargoRepository.fetchCargo_s();
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao buscar cargos.");
+    }
   }
 
   async create(form: ICargo) {
-    if (!form.Nome) {
-      throw new Error("Nome é obrigatório.");
+    try {
+      return await this.cargoRepository.createCargo(form);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao criar cargo.");
     }
-    return await this.cargoRepository.createCargo(form);
   }
 
   async update(Id: number, form: ICargo) {
-    const cargoExiste = await this.cargoRepository.fetchCargo_s();
-    if (!cargoExiste.find(c => c.Id === Id)) {
-      throw new Error("Cargo não encontrado.");
+    try {
+      const cargoExiste = await this.cargoRepository.fetchCargo_s();
+      if (!cargoExiste.find(c => c.Id === Id)) {
+        throw new Error("Cargo não encontrado.");
+      }
+      return await this.cargoRepository.updateCargo(Id, form);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao atualizar cargo.");
     }
-    return await this.cargoRepository.updateCargo(Id, form);
   }
 
   async delete(Id: number) {
-    return await this.cargoRepository.deleteCargo(Id);
+    try {
+      return await this.cargoRepository.deleteCargo(Id);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao deletar cargo.");
+    }
   }
 }

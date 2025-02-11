@@ -1,23 +1,40 @@
-import type { ICargo } from './Cargo';
-import type { IPessoa } from './Pessoa';
 
-export interface IHistoricoCargo {
+export interface IHistoricoCargoResponse {
   Id: number;
   DataInicio: Date;
   DataFim: Date;
   Descricao: string;
 
-  Cargo: ICargo;
-  Pessoa: IPessoa;
+  PessoaNome: string;
+  CargoNome: string;
 }
 
-export class HistoricoCargo implements IHistoricoCargo {
+export class HistoricoCargo implements IHistoricoCargoResponse {
   public constructor (
     public Id: number,
     public DataInicio: Date,
     public DataFim: Date,
     public Descricao: string,
-    public Cargo: ICargo,
-    public Pessoa: IPessoa
+    public PessoaNome: string,
+    public CargoNome: string
+  ) {}
+}
+
+export interface IHistoricoCargoRequest {
+  DataInicio: Date;
+  DataFim: Date;
+  Descricao: string;
+  PessoaId: number;
+  CargoId: number;
+}
+
+export class HistoricoCargoRequest implements IHistoricoCargoRequest {
+  public constructor (
+    public Id: number,
+    public DataInicio: Date,
+    public DataFim: Date,
+    public Descricao: string,
+    public PessoaId: number,
+    public CargoId: number
   ) {}
 }

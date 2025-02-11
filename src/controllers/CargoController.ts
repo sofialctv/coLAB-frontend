@@ -1,25 +1,43 @@
+import CargoService from '@/services/CargoService';
 import type { ICargo } from '../models/Entities/Cargo';
-import CargoRepository from '../models/Repositories/CargoRepository';
 
 export default class CargoController {
-  cargoRepository;
-  constructor() {
-    this.cargoRepository = new CargoRepository();
-  }
+
+  private cargoService = new CargoService();
 
   async getAll() {
-    return await this.cargoRepository.fetchCargo_s();
+    try {
+      return await this.cargoService.getAll();
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao buscar cargos.");
+    }
   }
 
   async create(form: ICargo) {
-    return await this.cargoRepository.createCargo(form);
+    try {
+      return await this.cargoService.create(form);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao criar cargo.");
+    }
   }
 
   async update(Id: number, form: ICargo) {
-    return await this.cargoRepository.updateCargo(Id, form);
+    try {
+      return await this.cargoService.update(Id, form);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao atualizar cargo.");
+    }
   }
 
   async delete(Id: number) {
-    return await this.cargoRepository.deleteCargo(Id);
+    try {
+      return await this.cargoService.delete(Id);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao deletar cargo.");
+    }
   }
 }

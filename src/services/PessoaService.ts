@@ -1,6 +1,5 @@
 import PessoaRepository from '../models/Repositories/PessoaRepository';
 import type { IPessoaResponse, IPessoaRequest } from '../models/Entities/Pessoa';
-import type { IHistoricoCargo } from '../models/Entities/HistoricoCargo';
 
 export default class PessoaService {
   private pessoaRepository: PessoaRepository;

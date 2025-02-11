@@ -1,12 +1,12 @@
 import type { BaseConfig } from './BaseConfig'
 
 class PessoaRoutes {
-  protected config: BaseConfig
-  protected name: string
+  protected config: BaseConfig;
+  protected name: string;
 
   constructor(config: BaseConfig) {
-    this.config = config
-    this.name = 'Pessoa'
+    this.config = config;
+    this.name = 'pessoa';
   };
 
   // GET
