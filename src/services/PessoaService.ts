@@ -18,7 +18,6 @@ export default class PessoaService {
   }
 
   async create(form: IPessoaRequest) {
-
     try {
       if (!form.Nome || !form.Email) {
         throw new Error("Nome e Email são obrigatórios.");

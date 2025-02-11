@@ -1,25 +1,43 @@
-import type { IHistoricoCargo } from '../models/Entities/HistoricoCargo';
-import HistoricoCargoRepository from '../models/Repositories/HistoricoCargoRepository';
+import HistoricoCargoService from '@/services/HistoricoCargoService';
+import type { IHistoricoCargoRequest } from '../models/Entities/HistoricoCargo';
 
 export default class HistoricoCargoController {
-  historicoCargoRepository;
-  constructor() {
-    this.historicoCargoRepository = new HistoricoCargoRepository();
-  }
+
+  private historicoCargoService = new HistoricoCargoService();
 
   async getAll() {
-    return await this.historicoCargoRepository.fetchHistoricoCargo_s();
+    try {
+      return await this.historicoCargoService.getAll();
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao buscar históricos de cargo.");
+    }
   }
 
-  async create(form: IHistoricoCargo) {
-    return await this.historicoCargoRepository.createHistoricoCargo(form);
+  async create(form: IHistoricoCargoRequest) {
+    try {
+      return await this.historicoCargoService.create(form);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao criar histórico de cargo.");
+    }
   }
 
-  async update(Id: number, item: IHistoricoCargo) {
-    return await this.historicoCargoRepository.updateHistoricoCargo(Id, item);
+  async update(Id: number, item: IHistoricoCargoRequest) {
+    try {
+      return await this.historicoCargoService.update(Id, item);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao atualizar histórico de cargo.");
+    }
   }
 
   async delete(Id: number) {
-    return await this.historicoCargoRepository.deleteHistoricoCargo(Id);
+    try {
+      return await this.historicoCargoService.delete(Id);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Erro ao deletar histórico de cargo.");
+    }
   }
 }

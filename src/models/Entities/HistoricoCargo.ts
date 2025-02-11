@@ -9,7 +9,7 @@ export interface IHistoricoCargoResponse {
   CargoNome: string;
 }
 
-export class HistoricoCargo implements IHistoricoCargoResponse {
+export class HistoricoCargoResponse implements IHistoricoCargoResponse {
   public constructor (
     public Id: number,
     public DataInicio: Date,
@@ -21,6 +21,7 @@ export class HistoricoCargo implements IHistoricoCargoResponse {
 }
 
 export interface IHistoricoCargoRequest {
+  Id: number;
   DataInicio: Date;
   DataFim: Date;
   Descricao: string;

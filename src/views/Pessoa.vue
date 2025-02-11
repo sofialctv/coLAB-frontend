@@ -3,9 +3,11 @@
   import { PessoaRequest, type IPessoaRequest, type IPessoaResponse } from '../models/Entities/Pessoa';
   import GenericSnackbar from '../components/GenericSnackbar.vue';
   import PessoaController from '../controllers/PessoaController';
-  import type { IHistoricoCargo } from '../models/Entities/HistoricoCargo';
-  import type { ICargo } from '@/models/Entities/Cargo';
-import CargoController from '@/controllers/CargoController';
+  import type { ICargoResponse } from '@/models/Entities/Cargo';
+  import CargoController from '@/controllers/CargoController';
+  import HistoricoCargoController from '@/controllers/HistoricoCargoController';
+import { HistoricoCargoRequest } from '@/models/Entities/HistoricoCargo';
+import { NULL } from 'sass';
 
   /////////////////////// Snackbar ///////////////////////
   const snackbar = ref(false);
@@ -38,15 +40,25 @@ import CargoController from '@/controllers/CargoController';
       '',
       '',
       -1,
+    )
+
+  const historicoCargoPadrao = () =>
+    new HistoricoCargoRequest(
+      0,
+      new Date(),
+      new Date(),
+      '',
       -1,
+      -1
     )
 
   // Estados reativos
   const loading = ref(false);
   const pessoas = ref<IPessoaResponse[]>([]);
-  const cargos = ref<ICargo[]>([]);
+  const cargos = ref<ICargoResponse[]>([]);
   const dialog = ref(false); // Estado do modal
   const novaPessoa = ref<IPessoaRequest>(pessoaPadrao()); // Pessoa selecionada para edição
+  const novoHistoricoCargo = ref<HistoricoCargoRequest>(historicoCargoPadrao());
 
   // Cabeçalhos da tabela
   const headers = [
@@ -87,14 +99,21 @@ import CargoController from '@/controllers/CargoController';
 
   const abrirNovaPessoa = () => {
     novaPessoa.value = pessoaPadrao(); // Garante que um novo objeto será criado
+    novoHistoricoCargo.value = historicoCargoPadrao();
     carregarCargos();
     dialog.value = true;
   };
 
   const criarNovaPessoa = async () => {
-    const controller = new PessoaController();
+    const controllerPessoa = new PessoaController();
     try {
-      await controller.create(novaPessoa.value);
+      const pessoaCriada = await controllerPessoa.create(novaPessoa.value);
+      if (!pessoaCriada || !pessoaCriada.data.Id) {
+        throw new Error("Erro ao obter o ID da pessoa criada.");
+      }
+
+      await criarNovoHistorico(pessoaCriada.data);
+
       snackbarSuccess('Pessoa criada com sucesso!');
       dialog.value = false;
       await carregarPessoas(); // Recarrega a lista após criar
@@ -102,6 +121,23 @@ import CargoController from '@/controllers/CargoController';
       console.error('Erro ao criar pessoa:', error);
     }
   };
+
+  const criarNovoHistorico = async (pessoaCriada: any) => {
+    const cargoController = new CargoController();
+    const controllerHistorico = new HistoricoCargoController();
+
+    const cargoAtual = await cargoController.getAll(novoHistoricoCargo.value.CargoId);
+
+    novoHistoricoCargo.value = {
+      ...novoHistoricoCargo.value,
+      DataInicio: new Date(),
+      Descricao: `Pessoa ${pessoaCriada.Nome} iniciou no cargo ${cargoAtual.value.Nome}.`,
+      PessoaId: pessoaCriada.value.Id,
+      CargoId: novoHistoricoCargo.value.CargoId
+    }
+
+    await controllerHistorico.create(novoHistoricoCargo.value);
+  }
 
   // Função para editar uma pessoa
   async function editarPessoa(id: number) {
@@ -196,7 +232,7 @@ import CargoController from '@/controllers/CargoController';
             ></v-text-field>
             <v-select
               label="Cargo"
-              v-model="novaPessoa.CargoId"
+              v-model="novoHistoricoCargo.CargoId"
               :items="cargos"
               item-title="Nome"
               item-value="Id"

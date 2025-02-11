@@ -16,7 +16,8 @@ export default class PessoaController {
 
   async create(form: IPessoaRequest) {
     try {
-      return await this.pessoaService.create(form);
+      const response = await this.pessoaService.create(form);
+      return response;
     } catch (error) {
       console.error(error);
       throw new Error("Erro ao criar pessoa.");

@@ -1,20 +1,20 @@
 import CargoService from '@/services/CargoService';
-import type { ICargo } from '../models/Entities/Cargo';
+import type { ICargoRequest } from '../models/Entities/Cargo';
 
 export default class CargoController {
 
   private cargoService = new CargoService();
 
-  async getAll() {
+  async getAll(id? : number) {
     try {
-      return await this.cargoService.getAll();
+      return await this.cargoService.getAll(id);
     } catch (error) {
       console.error(error);
       throw new Error("Erro ao buscar cargos.");
     }
   }
 
-  async create(form: ICargo) {
+  async create(form: ICargoRequest) {
     try {
       return await this.cargoService.create(form);
     } catch (error) {
@@ -23,7 +23,7 @@ export default class CargoController {
     }
   }
 
-  async update(Id: number, form: ICargo) {
+  async update(Id: number, form: ICargoRequest) {
     try {
       return await this.cargoService.update(Id, form);
     } catch (error) {

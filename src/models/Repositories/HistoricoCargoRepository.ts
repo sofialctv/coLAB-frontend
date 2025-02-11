@@ -1,33 +1,38 @@
 import api from '@/api/api';
-import type { IHistoricoCargo } from '../Entities/HistoricoCargo';
-import { HistoricoCargo } from '../Entities/HistoricoCargo';
+import { HistoricoCargoResponse, type IHistoricoCargoRequest } from '../Entities/HistoricoCargo';
 import HistoricoCargoRoutes from '../ApiRoutes/HistoricoCargoRoutes';
 
 export default class HistoricoCargoRepository {
+  apiClient;
 
-  private historicoCargoRoutes = new HistoricoCargoRoutes();
+  constructor() {
+    this.apiClient = api;
+  };
 
-  // Se um ID for passado ele chama o getById, se não, chama o getAll
-  private createBaseRoute(Id?: number) : string {
-    return Id ? this.historicoCargoRoutes.getById(Id) : this.historicoCargoRoutes.getAll();
-  }
+  createBaseRoute() {
+    return new HistoricoCargoRoutes({}).getAll;
+  };
 
+  createDeleteRoute(id: number) {
+    return new HistoricoCargoRoutes({ id: id }).delete;
+  };
 
   async fetchHistoricoCargo_s() {
     try {
       const baseRoute = this.createBaseRoute();
-      const response = await api.get(baseRoute);
+      const response = await this.apiClient.get(baseRoute);
 
       // Retorna a função com a criação de objetos
-      return response.data.value.map((historicoCargo: IHistoricoCargo) =>
-        new HistoricoCargo(
-          historicoCargo.Id,
-          historicoCargo.DataInicio,
-          historicoCargo.DataFim,
-          historicoCargo.Descricao,
-          historicoCargo.Cargo,
-          historicoCargo.Pessoa
-        ));
+      return response.data.$values.map((historicoCargo: any) => {
+        return new HistoricoCargoResponse(
+          historicoCargo.id,
+          historicoCargo.data_inicio,
+          historicoCargo.data_fim,
+          historicoCargo.descricao,
+          historicoCargo.pessoaNome,
+          historicoCargo.cargoNome
+        );
+      });
 
     } catch (error) {
       console.error("Erro ao buscar históricos de cargo.", error);
@@ -35,10 +40,10 @@ export default class HistoricoCargoRepository {
     }
   }
 
-  async createHistoricoCargo(form: IHistoricoCargo) {
+  async createHistoricoCargo(form: IHistoricoCargoRequest) {
     try {
-      const baseRoute = this.historicoCargoRoutes.post();
-      const response = await api.post(baseRoute, form);
+      const baseRoute = this.createBaseRoute();
+      const response = await this.apiClient.post(baseRoute, form);
 
       return response; // Retorna a resposta do backend
 
@@ -48,10 +53,11 @@ export default class HistoricoCargoRepository {
     }
   }
 
-  async updateHistoricoCargo(Id: number, form: IHistoricoCargo) {
+  async updateHistoricoCargo(Id: number, form: IHistoricoCargoRequest) {
     try {
-      const baseRoute = this.historicoCargoRoutes.update(Id);
-      const response = await api.put(baseRoute, form);
+      const baseRoute = this.createBaseRoute();
+      form.Id = Id;
+      const response = await this.apiClient.put(`${baseRoute}/${Id}`, form);
 
       return response;
 
@@ -63,8 +69,8 @@ export default class HistoricoCargoRepository {
 
   async deleteHistoricoCargo(Id: number) {
     try {
-      const baseRoute = this.historicoCargoRoutes.delete(Id);
-      const response = await api.delete(baseRoute);
+      const baseRoute = this.createDeleteRoute(Id);
+      const response = await this.apiClient.delete(baseRoute);
 
       // Retorna a resposta do backend
       return response;

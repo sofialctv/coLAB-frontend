@@ -1,4 +1,4 @@
-import type { IHistoricoCargo } from './HistoricoCargo';
+import type { IHistoricoCargoResponse } from './HistoricoCargo';
 
 export interface IPessoaResponse {
   Id: number;
@@ -8,7 +8,7 @@ export interface IPessoaResponse {
   Cpf: string;
   CargoNome: string;
   BolsaNome: string;
-  HistoricosCargo?: IHistoricoCargo[];
+  HistoricosCargo?: IHistoricoCargoResponse[];
 }
 
 export class PessoaResponse implements IPessoaResponse {
@@ -20,7 +20,7 @@ export class PessoaResponse implements IPessoaResponse {
     public Cpf: string,
     public CargoNome: string,
     public BolsaNome: string,
-    public HistoricosCargo?: IHistoricoCargo[]
+    public HistoricosCargo?: IHistoricoCargoResponse[]
   ) {}
 }
 
@@ -31,7 +31,6 @@ export interface IPessoaRequest {
   Email: string;
   Telefone: string;
   Cpf: string;
-  CargoId: number;
   BolsaId: number;
 }
 
@@ -42,7 +41,6 @@ export class PessoaRequest {
     public Email: string,
     public Telefone: string,
     public Cpf: string,
-    public CargoId: number,
     public BolsaId: number
   ) {}
 }

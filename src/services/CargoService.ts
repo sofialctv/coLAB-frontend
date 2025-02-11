@@ -8,9 +8,12 @@ export default class CargoService {
     this.cargoRepository = new CargoRepository();
   }
 
-  async getAll(): Promise<ICargo[]> {
+  async getAll(id?: number): Promise<ICargo | ICargo[]> {
     try {
-      return await this.cargoRepository.fetchCargo_s();
+      if (id !== undefined) {
+        return await this.cargoRepository.fetchCargo_s(id); // Chama o método de busca por ID
+      }
+      return await this.cargoRepository.fetchCargo_s(); // Busca todos os cargos
     } catch (error) {
       console.error(error);
       throw new Error("Erro ao buscar cargos.");

@@ -1,6 +1,6 @@
 import api from '@/api/api';
-import type { ICargo } from '../Entities/Cargo';
-import { Cargo } from '../Entities/Cargo';
+import type { ICargoRequest } from '../Entities/Cargo';
+import { CargoResponse } from '../Entities/Cargo';
 import CargoRoutes from '../ApiRoutes/CargoRoutes';
 
 export default class CargoRepository {
@@ -18,18 +18,26 @@ export default class CargoRepository {
     return new CargoRoutes({ id: id }).delete;
   };
 
-  async fetchCargo_s() {
+  async fetchCargo_s(id?: number) {
     try {
-      const baseRoute = this.createBaseRoute();
+      // Se um id é passado, usa a rota getById, senão usa a rota getAll
+      const baseRoute = id ? new CargoRoutes({ id }).getById : this.createBaseRoute();
+
       const response = await this.apiClient.get(baseRoute);
 
-      // Retorna a função com a criação de objetos
-      return response.data.$value.map((cargo: any) => {
-        return new Cargo (
-          cargo.id,
-          cargo.nome,
+      if (id) {
+        return new CargoResponse(
+          response.data.id,
+          response.data.nome,
         );
-      });
+      } else {
+        return response.data.$values.map((cargo: any) => {
+          return new CargoResponse (
+            cargo.id,
+            cargo.nome,
+          );
+        });
+      }
 
     } catch (error) {
       const err = error as any;
@@ -44,7 +52,7 @@ export default class CargoRepository {
     }
   }
 
-  async createCargo(form: ICargo) {
+  async createCargo(form: ICargoRequest) {
     try {
       const baseRoute = this.createBaseRoute();
       const response = await this.apiClient.post(baseRoute, form);
@@ -57,7 +65,7 @@ export default class CargoRepository {
     }
   }
 
-  async updateCargo(Id: number, form: ICargo) {
+  async updateCargo(Id: number, form: ICargoRequest) {
     try {
       const baseRoute = this.createBaseRoute();
       form.Id = Id;
