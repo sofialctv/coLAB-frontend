@@ -17,7 +17,7 @@ export default class FinanciadorRepository {
     return new FinanciadorRoutes({ id: id }).delete
   }
 
-  async fetchFinanciador_es() {
+  async fetchAllFinanciador() {
     try {
       // Criar rota de conexão
       const baseRoute = this.createBaseRoute()
@@ -26,16 +26,16 @@ export default class FinanciadorRepository {
       const response = await this.apiClient.get(baseRoute)
 
       // Retorna a função com a criação de objetos
-      return response.data.$values.map((projeto: IFinanciador) => {
-
+      return response.data.$values.map((item: IFinanciador) => {
         return new Financiador(
-          projeto.Id,
-          projeto.Nome,
-          projeto.Email
+          item.Id,
+          item.Nome,
+          item.Email,
         )
       })
+
     } catch (error) {
-      console.error('Erro ao buscar financiadores.', error)
+      console.error('Erro ao buscar projetos.', error)
       throw error
     }
   }
