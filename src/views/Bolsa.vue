@@ -230,7 +230,7 @@ const excluirBolsa = async (Id: number) => {
               <v-btn icon color="blue" size="small" @click="editarBolsa(item)">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
-              <v-btn icon color="red" size="small" @click="excluirBolsa(item.Id!)">
+              <v-btn icon color="red" size="small" @click="excluirBolsa(item.Id)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </td>

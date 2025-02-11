@@ -70,9 +70,9 @@
     }
   }
 
-  const excluirFinanciador = async (id: number) => {
+  const excluirFinanciador = async (Id: number) => {
     if (confirm('Deseja realmente excluir este financiador?')) {
-      await financiadorController.delete(id);
+      await financiadorController.delete(Id);
       await carregarFinanciadores();
     }
   }
@@ -100,7 +100,7 @@
       <v-card-title>
         <span class="text-h5">Gerenciamento de Financiadores</span>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="cadastrarFinanciador">Cadastrar Financiador</v-btn>
+        <v-btn color="primary" @click="cadastrarFinanciador">Novo Financiador</v-btn>
       </v-card-title>
 
       <v-data-table :headers="[
