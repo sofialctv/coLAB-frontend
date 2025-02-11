@@ -6,8 +6,9 @@
   import type { ICargoResponse } from '@/models/Entities/Cargo';
   import CargoController from '@/controllers/CargoController';
   import HistoricoCargoController from '@/controllers/HistoricoCargoController';
-import { HistoricoCargoRequest } from '@/models/Entities/HistoricoCargo';
-import { NULL } from 'sass';
+  import { HistoricoCargoRequest } from '@/models/Entities/HistoricoCargo';
+  import BolsaController from '@/controllers/BolsaController';
+  import type { IBolsa } from '@/models/Entities/Bolsa';
 
   /////////////////////// Snackbar ///////////////////////
   const snackbar = ref(false);
@@ -56,8 +57,11 @@ import { NULL } from 'sass';
   const loading = ref(false);
   const pessoas = ref<IPessoaResponse[]>([]);
   const cargos = ref<ICargoResponse[]>([]);
-  const dialog = ref(false); // Estado do modal
-  const novaPessoa = ref<IPessoaRequest>(pessoaPadrao()); // Pessoa selecionada para edição
+  const bolsas = ref<IBolsa[]>([]);
+  const modalCadastro = ref(false); // Estado do modal
+  const modalEdicao = ref(false);
+  const novaPessoa = ref<IPessoaRequest>(pessoaPadrao()); // Pessoa para cadastro
+  const pessoaSelecionada = ref<IPessoaRequest | null>(null); // Pessoa selecionada para edição
   const novoHistoricoCargo = ref<HistoricoCargoRequest>(historicoCargoPadrao());
 
   // Cabeçalhos da tabela
@@ -97,25 +101,70 @@ import { NULL } from 'sass';
     }
   }
 
+  async function carregarBolsas() {
+    loading.value = true;
+    const controller = new BolsaController();
+    try {
+      bolsas.value = await controller.getAll();
+    } catch (error) {
+      console.error('Erro ao carregar bolsas:', error);
+    } finally {
+      loading.value = false;
+    }
+  }
+
   const abrirNovaPessoa = () => {
     novaPessoa.value = pessoaPadrao(); // Garante que um novo objeto será criado
     novoHistoricoCargo.value = historicoCargoPadrao();
     carregarCargos();
-    dialog.value = true;
+    modalCadastro.value = true;
   };
+
+  const abrirEdicaoPessoa = async (id: number) => {
+    const pessoaController = new PessoaController();
+
+    try {
+      const pessoaArray = await pessoaController.getAll(id);
+      if (!pessoaArray) {
+        snackbarError('Erro ao carregar pessoa!');
+        return;
+      }
+
+      const pessoa = pessoaArray[0];
+
+      const bolsaCorrespondente = bolsas.value.find(b => b.Nome === pessoa.BolsaNome);
+      const bolsaId = bolsaCorrespondente ? bolsaCorrespondente.Id : null;
+
+      pessoaSelecionada.value = new PessoaRequest (
+        pessoa.Id,
+        pessoa.Nome,
+        pessoa.Email,
+        pessoa.Telefone,
+        pessoa.Cpf,
+        bolsaId
+      );
+
+      carregarCargos();
+      carregarBolsas();
+      modalEdicao.value = true;
+
+    } catch (error) {
+      console.error('Erro ao carregar pessoa:', error);
+    }
+  }
 
   const criarNovaPessoa = async () => {
     const controllerPessoa = new PessoaController();
     try {
       const pessoaCriada = await controllerPessoa.create(novaPessoa.value);
-      if (!pessoaCriada || !pessoaCriada.data.Id) {
+      if (!pessoaCriada || !pessoaCriada.data.id) {
         throw new Error("Erro ao obter o ID da pessoa criada.");
       }
 
       await criarNovoHistorico(pessoaCriada.data);
 
       snackbarSuccess('Pessoa criada com sucesso!');
-      dialog.value = false;
+      modalCadastro.value = false;
       await carregarPessoas(); // Recarrega a lista após criar
     } catch (error) {
       console.error('Erro ao criar pessoa:', error);
@@ -126,23 +175,48 @@ import { NULL } from 'sass';
     const cargoController = new CargoController();
     const controllerHistorico = new HistoricoCargoController();
 
-    const cargoAtual = await cargoController.getAll(novoHistoricoCargo.value.CargoId);
+    const idCargo = novoHistoricoCargo.value.CargoId;
+    const cargoAtual = await cargoController.getAll(idCargo);
+    console.log("Cargo atual:", cargoAtual);
+    console.log("Novo Historico de Cargo:", novoHistoricoCargo);
+    if (!cargoAtual || !cargoAtual[0].Id) {
+      throw new Error("Erro ao pegar Cargo.");
+    }
 
     novoHistoricoCargo.value = {
       ...novoHistoricoCargo.value,
       DataInicio: new Date(),
-      Descricao: `Pessoa ${pessoaCriada.Nome} iniciou no cargo ${cargoAtual.value.Nome}.`,
-      PessoaId: pessoaCriada.value.Id,
+      Descricao: `Pessoa ${pessoaCriada.nome} iniciou no cargo ${cargoAtual[0].Nome}.`,
+      PessoaId: pessoaCriada.data.id,
       CargoId: novoHistoricoCargo.value.CargoId
     }
 
-    await controllerHistorico.create(novoHistoricoCargo.value);
+    try {
+      await controllerHistorico.create(novoHistoricoCargo.value);
+
+    } catch (error) {
+      console.error('Erro ao criar histórico:', error);
+    }
   }
 
   // Função para editar uma pessoa
-  async function editarPessoa(id: number) {
-    console.log('Editar pessoa com ID:', id);
-    // Implemente a lógica de edição aqui
+  async function salvarEdicao(id: number) {
+    if (!pessoaSelecionada.value) {
+      snackbarError('Erro ao salvar edição!');
+      return;
+    }
+
+    const controller = new PessoaController();
+    try {
+      await controller.update(id, pessoaSelecionada.value);
+      await carregarPessoas(); // Recarrega a lista após editar
+      snackbarSuccess('Pessoa editada com sucesso!');
+      criarNovoHistorico(pessoaSelecionada.value);
+      modalEdicao.value = false;
+    } catch (error) {
+      snackbarError('Erro ao editar pessoa!');
+      console.error('Erro ao editar pessoa:', error);
+    }
   }
 
   // Função para deletar uma pessoa
@@ -153,7 +227,9 @@ import { NULL } from 'sass';
       try {
         await controller.delete(id);
         await carregarPessoas(); // Recarrega a lista após deletar
+        snackbarSuccess('Pessoa deletada com sucesso!');
       } catch (error) {
+        snackbarError('Erro ao deletar pessoa!');
         console.error('Erro ao deletar pessoa:', error);
       }
     }
@@ -183,7 +259,7 @@ import { NULL } from 'sass';
         no-data-text="Nenhuma pessoa encontrada"
       >
         <template v-slot:item.actions="{ item }">
-          <v-icon small class="mr-2" @click="editarPessoa(item.Id)">
+          <v-icon small class="mr-2" @click="abrirEdicaoPessoa(item.Id)">
             mdi-pencil
           </v-icon>
           <v-icon small @click="deletarPessoa(item.Id)">
@@ -194,7 +270,7 @@ import { NULL } from 'sass';
     </v-card>
 
     <!-- Modal de Cadastro -->
-    <v-dialog v-model="dialog">
+    <v-dialog v-model="modalCadastro">
       <v-card>
         <v-card-title>
           <span class="text-h5">Cadastrar Pessoa</span>
@@ -244,8 +320,66 @@ import { NULL } from 'sass';
         </v-card-text>
 
         <v-card-actions>
-          <v-btn color="red" @click="dialog = false">Cancelar</v-btn>
+          <v-btn color="red" @click="modalCadastro = false">Cancelar</v-btn>
           <v-btn color="green" @click="criarNovaPessoa">Salvar</v-btn>
+        </v-card-actions>
+
+      </v-card>
+    </v-dialog>
+
+    <!-- Modal de Edição -->
+    <v-dialog v-model="modalEdicao">
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Editar Pessoa</span>
+        </v-card-title>
+
+        <v-card-text>
+          <v-form ref="form">
+            <v-text-field
+              label="Nome"
+              v-model="pessoaSelecionada.Nome"
+              :rules="[rules.required]"
+              class="mb-4"
+              outlined
+            ></v-text-field>
+            <v-text-field
+              label="Email"
+              v-model="pessoaSelecionada.Email"
+              :rules="[rules.required]"
+              class="mb-4"
+              outlined
+            ></v-text-field>
+            <v-text-field
+              label="Telefone"
+              v-model="pessoaSelecionada.Telefone"
+              :rules="[rules.required]"
+              class="mb-4"
+              outlined
+            ></v-text-field>
+            <v-text-field
+              label="Cpf"
+              v-model="pessoaSelecionada.Cpf"
+              :rules="[rules.required]"
+              class="mb-4"
+              outlined
+            ></v-text-field>
+            <v-select
+              label="Cargo"
+              v-model="novoHistoricoCargo.CargoId"
+              :items="cargos"
+              item-title="Nome"
+              item-value="Id"
+              :rules="[rules.required]"
+              class="mb-4"
+              outlined
+            ></v-select>
+          </v-form>
+        </v-card-text>
+
+        <v-card-actions>
+          <v-btn color="red" @click="modalEdicao = false">Cancelar</v-btn>
+          <v-btn color="green" @click="salvarEdicao">Salvar</v-btn>
         </v-card-actions>
 
       </v-card>

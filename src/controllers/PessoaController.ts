@@ -5,9 +5,9 @@ export default class PessoaController {
 
   private pessoaService = new PessoaService();
 
-  async getAll() {
+  async getAll(id? : number) {
     try {
-      return await this.pessoaService.getAll();
+      return await this.pessoaService.getAll(id);
     } catch (error) {
       console.error(error);
       throw new Error("Erro ao buscar pessoas.");

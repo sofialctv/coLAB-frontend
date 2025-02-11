@@ -7,7 +7,7 @@ export interface IPessoaResponse {
   Telefone: string;
   Cpf: string;
   CargoNome: string;
-  BolsaNome: string;
+  BolsaNome: string | null;
   HistoricosCargo?: IHistoricoCargoResponse[];
 }
 
@@ -19,7 +19,7 @@ export class PessoaResponse implements IPessoaResponse {
     public Telefone: string,
     public Cpf: string,
     public CargoNome: string,
-    public BolsaNome: string,
+    public BolsaNome: string | null,
     public HistoricosCargo?: IHistoricoCargoResponse[]
   ) {}
 }
@@ -31,7 +31,7 @@ export interface IPessoaRequest {
   Email: string;
   Telefone: string;
   Cpf: string;
-  BolsaId: number;
+  BolsaId: number | null;
 }
 
 export class PessoaRequest {
@@ -41,6 +41,6 @@ export class PessoaRequest {
     public Email: string,
     public Telefone: string,
     public Cpf: string,
-    public BolsaId: number
+    public BolsaId: number | null
   ) {}
 }

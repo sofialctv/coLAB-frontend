@@ -8,8 +8,11 @@ export default class PessoaService {
     this.pessoaRepository = new PessoaRepository();
   }
 
-  async getAll(): Promise<IPessoaResponse[]> {
+  async getAll(id?: number): Promise<IPessoaResponse[]> {
     try {
+      if (id !== undefined) {
+        return await this.pessoaRepository.fetchPessoa_s(id);
+      }
       return await this.pessoaRepository.fetchPessoa_s();
     } catch (error) {
       console.error(error);

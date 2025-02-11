@@ -1,5 +1,5 @@
 import CargoRepository from '../models/Repositories/CargoRepository';
-import type { ICargo } from '../models/Entities/Cargo';
+import type { ICargoRequest, ICargoResponse } from '../models/Entities/Cargo';
 
 export default class CargoService {
   private cargoRepository: CargoRepository;
@@ -8,7 +8,7 @@ export default class CargoService {
     this.cargoRepository = new CargoRepository();
   }
 
-  async getAll(id?: number): Promise<ICargo | ICargo[]> {
+  async getAll(id?: number): Promise<ICargoResponse[]> {
     try {
       if (id !== undefined) {
         return await this.cargoRepository.fetchCargo_s(id); // Chama o método de busca por ID
@@ -20,7 +20,7 @@ export default class CargoService {
     }
   }
 
-  async create(form: ICargo) {
+  async create(form: ICargoRequest) {
     try {
       return await this.cargoRepository.createCargo(form);
     } catch (error) {
@@ -29,7 +29,7 @@ export default class CargoService {
     }
   }
 
-  async update(Id: number, form: ICargo) {
+  async update(Id: number, form: ICargoRequest) {
     try {
       const cargoExiste = await this.cargoRepository.fetchCargo_s();
       if (!cargoExiste.find(c => c.Id === Id)) {

@@ -17,9 +17,9 @@ export default class PessoaRepository {
     return new PessoaRoutes({ id: id }).delete;
   };
 
-  async fetchPessoa_s() {
+  async fetchPessoa_s(id?: number) {
     try {
-      const baseRoute = this.createBaseRoute();
+      const baseRoute = id ? new PessoaRoutes({ id }).getById : this.createBaseRoute();
       const response = await this.apiClient.get(baseRoute); // Faz a request usando a API com o axios
 
       return response.data.$values.map((pessoa: any) => {
