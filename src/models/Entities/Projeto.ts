@@ -30,5 +30,6 @@ export class Projeto implements IProjeto {
     public status: number,
     public bolsa?: IBolsa[],
     public historicoStatus?: IHistoricoStatus[],
+    public statusNome?: string,
   ) {}
 }
