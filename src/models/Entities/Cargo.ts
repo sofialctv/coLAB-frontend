@@ -3,7 +3,7 @@ export interface ICargoResponse {
   Id: number;
   Nome: string;
   Descricao: string;
-  Bolsas: any[];
+  Bolsas: any[] | null;
 }
 
 export class CargoResponse implements ICargoResponse {
