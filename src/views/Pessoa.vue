@@ -3,11 +3,7 @@
   import { PessoaRequest, type IPessoaRequest, type IPessoaResponse } from '../models/Entities/Pessoa';
   import GenericSnackbar from '../components/GenericSnackbar.vue';
   import PessoaController from '../controllers/PessoaController';
-  import type { ICargoResponse } from '@/models/Entities/Cargo';
   import CargoController from '@/controllers/CargoController';
-  import HistoricoCargoController from '@/controllers/HistoricoCargoController';
-  import { HistoricoCargoRequest } from '@/models/Entities/HistoricoCargo';
-  import BolsaController from '@/controllers/BolsaController';
   import type { IBolsa } from '@/models/Entities/Bolsa';
 
   /////////////////////// Snackbar ///////////////////////
@@ -40,29 +36,17 @@
       '',
       '',
       '',
-      -1,
-    )
-
-  const historicoCargoPadrao = () =>
-    new HistoricoCargoRequest(
-      0,
-      new Date(),
-      new Date(),
-      '',
-      -1,
-      -1
     )
 
   // Estados reativos
   const loading = ref(false);
   const pessoas = ref<IPessoaResponse[]>([]);
-  const cargos = ref<ICargoResponse[]>([]);
-  const bolsas = ref<IBolsa[]>([]);
   const modalCadastro = ref(false); // Estado do modal
   const modalEdicao = ref(false);
+  const modalBolsas = ref(false);
+  const modalDetalhesBolsa = ref(false);
   const novaPessoa = ref<IPessoaRequest>(pessoaPadrao()); // Pessoa para cadastro
   const pessoaSelecionada = ref<IPessoaRequest | null>(null); // Pessoa selecionada para edição
-  const novoHistoricoCargo = ref<HistoricoCargoRequest>(historicoCargoPadrao());
 
   // Cabeçalhos da tabela
   const headers = [
@@ -71,8 +55,6 @@
     { title: 'Email', key: 'Email' },
     { title: 'Telefone', key: 'Telefone' },
     { title: 'CPF', key: 'Cpf' },
-    { title: 'Cargo', key: 'CargoNome' },
-    { title: 'Bolsa', key: 'BolsaNome' },
     { title: 'Ações', key: 'actions', sortable: false }
   ];
 
@@ -89,65 +71,26 @@
     }
   }
 
-  async function carregarCargos() {
-    loading.value = true;
-    const controller = new CargoController();
-    try {
-      cargos.value = await controller.getAll();
-    } catch (error) {
-      console.error('Erro ao carregar cargos:', error);
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  async function carregarBolsas() {
-    loading.value = true;
-    const controller = new BolsaController();
-    try {
-      bolsas.value = await controller.getAll();
-    } catch (error) {
-      console.error('Erro ao carregar bolsas:', error);
-    } finally {
-      loading.value = false;
-    }
-  }
-
   const abrirNovaPessoa = () => {
     novaPessoa.value = pessoaPadrao(); // Garante que um novo objeto será criado
-    novoHistoricoCargo.value = historicoCargoPadrao();
-    carregarCargos();
     modalCadastro.value = true;
   };
 
-  const abrirEdicaoPessoa = async (id: number) => {
-    const pessoaController = new PessoaController();
-
+  const abrirEdicaoPessoa = async (pessoa: any) => {
     try {
-      const pessoaArray = await pessoaController.getAll(id);
-      if (!pessoaArray) {
+      console.log("Pessoa", pessoa);
+      if (!pessoa) {
         snackbarError('Erro ao carregar pessoa!');
         return;
       }
-
-      const pessoa = pessoaArray[0];
-
-      const bolsaCorrespondente = bolsas.value.find(b => b.Nome === pessoa.BolsaNome);
-      const bolsaId = bolsaCorrespondente ? bolsaCorrespondente.Id : null;
-
       pessoaSelecionada.value = new PessoaRequest (
         pessoa.Id,
         pessoa.Nome,
         pessoa.Email,
         pessoa.Telefone,
         pessoa.Cpf,
-        bolsaId
       );
-
-      carregarCargos();
-      carregarBolsas();
       modalEdicao.value = true;
-
     } catch (error) {
       console.error('Erro ao carregar pessoa:', error);
     }
@@ -161,8 +104,6 @@
         throw new Error("Erro ao obter o ID da pessoa criada.");
       }
 
-      await criarNovoHistorico(pessoaCriada.data);
-
       snackbarSuccess('Pessoa criada com sucesso!');
       modalCadastro.value = false;
       await carregarPessoas(); // Recarrega a lista após criar
@@ -170,34 +111,6 @@
       console.error('Erro ao criar pessoa:', error);
     }
   };
-
-  const criarNovoHistorico = async (pessoaCriada: any) => {
-    const cargoController = new CargoController();
-    const controllerHistorico = new HistoricoCargoController();
-
-    const idCargo = novoHistoricoCargo.value.CargoId;
-    const cargoAtual = await cargoController.getAll(idCargo);
-    console.log("Cargo atual:", cargoAtual);
-    console.log("Novo Historico de Cargo:", novoHistoricoCargo);
-    if (!cargoAtual || !cargoAtual[0].Id) {
-      throw new Error("Erro ao pegar Cargo.");
-    }
-
-    novoHistoricoCargo.value = {
-      ...novoHistoricoCargo.value,
-      DataInicio: new Date(),
-      Descricao: `Pessoa ${pessoaCriada.nome} iniciou no cargo ${cargoAtual[0].Nome}.`,
-      PessoaId: pessoaCriada.data.id,
-      CargoId: novoHistoricoCargo.value.CargoId
-    }
-
-    try {
-      await controllerHistorico.create(novoHistoricoCargo.value);
-
-    } catch (error) {
-      console.error('Erro ao criar histórico:', error);
-    }
-  }
 
   // Função para editar uma pessoa
   async function salvarEdicao(id: number) {
@@ -209,12 +122,10 @@
     const controller = new PessoaController();
     try {
       await controller.update(id, pessoaSelecionada.value);
-      await carregarPessoas(); // Recarrega a lista após editar
       snackbarSuccess('Pessoa editada com sucesso!');
-      criarNovoHistorico(pessoaSelecionada.value);
+      await carregarPessoas(); // Recarrega a lista após editar
       modalEdicao.value = false;
     } catch (error) {
-      snackbarError('Erro ao editar pessoa!');
       console.error('Erro ao editar pessoa:', error);
     }
   }
@@ -259,12 +170,15 @@
         no-data-text="Nenhuma pessoa encontrada"
       >
         <template v-slot:item.actions="{ item }">
-          <v-icon small class="mr-2" @click="abrirEdicaoPessoa(item.Id)">
-            mdi-pencil
-          </v-icon>
-          <v-icon small @click="deletarPessoa(item.Id)">
-            mdi-delete
-          </v-icon>
+          <td style="display: flex; gap: 0.5rem; align-items: center;">
+            <v-btn icon color="blue" size="small" @click="abrirEdicaoPessoa(item)">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+            <v-btn icon color="red" size="small" @click="deletarPessoa(item.Id)">
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+          </td>
+
         </template>
       </v-data-table>
     </v-card>
@@ -306,16 +220,6 @@
               class="mb-4"
               outlined
             ></v-text-field>
-            <v-select
-              label="Cargo"
-              v-model="novoHistoricoCargo.CargoId"
-              :items="cargos"
-              item-title="Nome"
-              item-value="Id"
-              :rules="[rules.required]"
-              class="mb-4"
-              outlined
-            ></v-select>
           </v-form>
         </v-card-text>
 
@@ -364,22 +268,12 @@
               class="mb-4"
               outlined
             ></v-text-field>
-            <v-select
-              label="Cargo"
-              v-model="novoHistoricoCargo.CargoId"
-              :items="cargos"
-              item-title="Nome"
-              item-value="Id"
-              :rules="[rules.required]"
-              class="mb-4"
-              outlined
-            ></v-select>
           </v-form>
         </v-card-text>
 
         <v-card-actions>
           <v-btn color="red" @click="modalEdicao = false">Cancelar</v-btn>
-          <v-btn color="green" @click="salvarEdicao">Salvar</v-btn>
+          <v-btn color="green" @click="salvarEdicao(pessoaSelecionada.Id)">Salvar</v-btn>
         </v-card-actions>
 
       </v-card>
