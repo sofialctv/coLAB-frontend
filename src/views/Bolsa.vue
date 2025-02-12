@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { toRaw } from "vue";
 import BolsaController from '../controllers/BolsaController';
-import type { IBolsa } from '../models/Entities/Bolsa';
+import type { IBolsa, IBolsaRequest } from '../models/Entities/Bolsa';
 import type { IPessoaResponse } from '../models/Entities/Pessoa';
 import type { IProjeto } from '../models/Entities/Projeto';
 import { Bolsa, BolsaRequest } from '../models/Entities/Bolsa';
+import type { ICargoResponse, ICargoRequest } from '../models/Entities/Cargo';
 import { Escolaridade } from '../models/Entities/Enums/Escolaridade';
 import GenericSnackbar from '../components/GenericSnackbar.vue';
 import PessoaController from '../controllers/PessoaController';
 import ProjetoController from '../controllers/ProjetoController';
-import { toRaw } from "vue";
+import CargoController from '../controllers/CargoController';
+
 
 
 const snackbar = ref(false);
@@ -36,11 +39,13 @@ const rules = {
 const pessoaController = new PessoaController();
 const projetoController = new ProjetoController();
 const bolsaController = new BolsaController();
+const cargoController = new CargoController();
 
 // Listas
 const bolsas = ref<IBolsa[]>([]);
 const pessoas = ref<IPessoaResponse[]>([]);
 const projetos = ref<IProjeto[]>([]);
+const cargos = ref<ICargoResponse[]>([]);
 
 // Estado do modal e bolsa editável
 const dialog = ref(false);
@@ -59,6 +64,8 @@ const bolsaSelecionada = ref<IBolsa>(
     "",                  // PessoaNome
     null,                // ProjetoId
     "",                  // ProjetoNome
+    null,                // CargoId
+    "",                  // CargoNome
     Escolaridade.Tecnico // Escolaridade
   )
 );
@@ -94,6 +101,10 @@ const carregarProjetos = async () => {
   projetos.value = await projetoController.getAll();
 };
 
+const carregarCargos = async () => {
+  cargos.value = await cargoController.getAll(); // Corrigido
+};
+
 // Verificando se a tela é menor que 1164px
 const adjustDatesContainer = ref(false)
 
@@ -105,6 +116,7 @@ onMounted(() => {
   carregarBolsas();
   carregarPessoas();
   carregarProjetos();
+  carregarCargos();
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
 })
@@ -124,6 +136,8 @@ const abrirNovaBolsa = () => {
     "",                  // PessoaNome
     null,                // ProjetoId
     "",                  // ProjetoNome
+    null,                // CargoId
+    "",                  // CargoNome
     Escolaridade.Tecnico // Escolaridade
   );
   dialog.value = true;
@@ -183,6 +197,7 @@ const TransformarEmBolsaRequest = (bolsa: IBolsa): BolsaRequest => {
     bolsa.Ativo,
     Number(bolsa.PessoaId),
     Number(bolsa.ProjetoId),
+    Number(bolsa.CargoId),
     bolsa.Escolaridade
   );
 };
@@ -257,6 +272,7 @@ const excluirBolsa = async (Id: number) => {
           { title: 'Plano de Trabalho', key: 'PlanoTrabalho' },
           { title: 'Pessoa', key: 'PessoaNome' },
           { title: 'Projeto', key: 'ProjetoNome' },
+          { title: 'Cargo', key: 'CargoNome' },
           { title: 'Data Início', key: 'DataInicio' },
           { title: 'Data prevista de Fim', key: 'DataPrevistaFim' },
           { title: 'Data Fim', key: 'DataFim' },
@@ -271,7 +287,8 @@ const excluirBolsa = async (Id: number) => {
             <td>  {{ item.Nome }} </td>
             <td>  {{ item.PlanoTrabalho }} </td>
             <td>  {{ item.PessoaNome }} </td>
-            <td> {{ item.ProjetoNome}} </td>
+            <td>  {{ item.ProjetoNome}} </td>
+            <td>  {{ item.CargoNome }} </td>
             <td>  {{ formatarDataParaDDMMYYYY(item.DataInicio) }} </td>
             <td>  {{ formatarDataParaDDMMYYYY(item.DataPrevistaFim) }}  </td>
             <td>  {{ formatarDataParaDDMMYYYY(item.DataFim) }} </td>
@@ -343,6 +360,19 @@ const excluirBolsa = async (Id: number) => {
                 :clearable="true"
               ></v-select>
             </div>
+            
+            <!-- Cargo -->
+            <label class="required-label">Cargo</label>
+            <v-select
+              v-model="bolsaSelecionada.CargoId"
+              :items="cargos"
+              :rules="[rules.required]"
+              item-title="Nome"
+              item-value="Id"
+              class="mb-4"
+              outlined
+              :clearable="true"
+            ></v-select>
 
             <label class="required-label">Status</label>
             <v-select
