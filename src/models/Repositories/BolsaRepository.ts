@@ -39,6 +39,8 @@ export default class BolsaRepository {
           bolsa.pessoaNome,
           bolsa.projetoId,
           bolsa.projetoNome,
+          bolsa.cargoId,
+          bolsa.cargoNome,
           bolsa.escolaridade
         );
       }) : response.data; // 🚀 Caso os dados venham direto

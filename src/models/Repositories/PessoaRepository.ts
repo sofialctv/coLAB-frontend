@@ -23,9 +23,6 @@ export default class PessoaRepository {
       const response = await this.apiClient.get(baseRoute); // Faz a request usando a API com o axios
 
       return response.data.$values.map((pessoa: any) => {
-        const historicosCargoArray = pessoa.historicosCargo?.$values || [];
-
-        const cargoAtual = historicosCargoArray ? this.getCargoAtual(historicosCargoArray) : "Sem cargo";
 
         return new PessoaResponse(
           pessoa.id,
@@ -33,9 +30,7 @@ export default class PessoaRepository {
           pessoa.email,
           pessoa.telefone,
           pessoa.cpf,
-          cargoAtual,
-          pessoa.bolsaNome,
-          historicosCargoArray
+          pessoa.bolsas,
         );
       });
 
@@ -91,38 +86,5 @@ export default class PessoaRepository {
       throw error;
     }
   }
-
-  getCargoAtual(historicosCargo: any[]): string {
-    if (!historicosCargo || !Array.isArray(historicosCargo)) {
-      return "Sem cargo";
-    }
-
-    const ultimoHistoricoCargo = historicosCargo
-      .filter(
-        (historicosCargo) =>
-          !historicosCargo.data_fim || historicosCargo.data_fim === "0001-01-01T00:00:00"
-      )
-      .sort(
-        (a, b) =>
-          new Date(b.data_inicio).getTime() - new Date(a.data_inicio).getTime()
-      );
-
-    return ultimoHistoricoCargo[0]?.cargoNome || "Sem cargo";
-  }
-
-  /*
-  async getHistoricosCargo(Id: number): Promise<IHistoricoCargo[]> {
-    try {
-      const baseRoute = this.createBaseRoute()
-      const response = await api.get<IPessoa>(baseRoute);
-
-      return response.data.HistoricosCargo ?? [];
-
-    } catch (error) {
-      console.error("Erro ao buscar históricos de cargo: ", error);
-      throw Error;
-    }
-  }
-  */
 
 }

@@ -1,4 +1,4 @@
-import type { IBolsa } from '../models/Entities/Bolsa'
+import type { IBolsa, IBolsaRequest } from '../models/Entities/Bolsa'
 import BolsaRepository from '../models/Repositories/BolsaRepository'
 
 export default class BolsaController {
@@ -11,11 +11,11 @@ export default class BolsaController {
     return await this.bolsaRepository.fetchAllBolsa()
   }
 
-  async create(form: IBolsa) {
+  async create(form: IBolsaRequest) {
     return await this.bolsaRepository.createBolsa(form)
   }
 
-  async update(id: number, form: IBolsa) {
+  async update(id: number, form: IBolsaRequest) {
     return await this.bolsaRepository.updateBolsa(id, form)
   }
 

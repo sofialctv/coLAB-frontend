@@ -41,10 +41,4 @@ export default class PessoaController {
       throw new Error("Erro ao deletar pessoa.");
     }
   }
-
-  /*
-  async getHistoricosCargo(Id: number) {
-    return await this.pessoaService.getHistoricosCargo(Id);
-  }
-  */
 }

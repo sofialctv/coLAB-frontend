@@ -29,12 +29,16 @@ export default class CargoRepository {
         return new CargoResponse(
           response.data.id,
           response.data.nome,
+          response.data.descricao,
+          response.data.bolsas
         );
       } else {
         return response.data.$values.map((cargo: any) => {
           return new CargoResponse (
             cargo.id,
             cargo.nome,
+            cargo.descricao,
+            cargo.bolsas
           );
         });
       }

@@ -11,6 +11,7 @@ export interface IBolsaRequest {
   ativo: boolean;
   pessoaId: number;
   projetoId: number;
+  cargoId: number;
   escolaridade: number;
 }
 
@@ -26,6 +27,7 @@ export class BolsaRequest implements IBolsaRequest {
     public ativo: boolean,
     public pessoaId: number,
     public projetoId: number,
+    public cargoId: number,
     public escolaridade: number
   ) {}
 }
@@ -45,6 +47,8 @@ export interface IBolsa {
     PessoaNome: string;
     ProjetoId: number | null;
     ProjetoNome: string;
+    CargoId: number | null;
+    CargoNome: string;
     Escolaridade: Escolaridade;
   }
 
@@ -62,6 +66,8 @@ export interface IBolsa {
       public PessoaNome: string,
       public ProjetoId: number | null,
       public ProjetoNome: string,
+      public CargoId: number | null,
+      public CargoNome: string,
       public Escolaridade: Escolaridade
     ) {}
   }
