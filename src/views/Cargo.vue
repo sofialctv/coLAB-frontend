@@ -108,59 +108,64 @@
   }
 
   const cadastrarCargo = () => {
-    cargoSelecionado.value = new Cargo(0, '', '');
+    cargoSelecionado.value = new Cargo(0, '', '', null);
     dialog.value = true;
   };
 
   const criarCargo = async () => {
-    try {
+  try {
+    if (cargoSelecionado.value.Id === 0) {
+
+      // Cria um novo cargo
       await cargoController.create(cargoSelecionado.value);
-      snackbarSuccess('Cargo criada com sucesso!');
-      dialog.value = false;
-      await carregarCargos();
-    } catch (error) {
-      console.error('Erro ao criar Cargo:', error);
-      snackbarError();
+      snackbarSuccess('Cargo criado com sucesso!');
+    } else {
+
+      // Atualiza um cargo existente
+      await cargoController.update(cargoSelecionado.value.Id, cargoSelecionado.value);
+      snackbarSuccess('Cargo atualizado com sucesso!');
     }
+    dialog.value = false;
+    await carregarCargos();
+  } catch (error) {
+    console.error('Erro ao salvar o cargo:', error);
+    snackbarError();
   }
+};
+
 
   const editarCargo = (Cargo: ICargoResponse) => {
     cargoSelecionado.value = { ...Cargo };
     dialog.value = true;
   }
 
-  const atualizarCargo = async () => {
-    try {
-      if (cargoSelecionado.value.Id) {
-        await CargoController.update(cargoSelecionado.value.Id, cargoSelecionado.value);
-        snackbarSuccess('Cargo atualizado com sucesso!');
-        dialog.value = false;
-        await carregarCargos();
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar Cargo:', error);
-      snackbarError();
-    }
-  }
-
   const excluirCargo = async (Id: number) => {
-    if (confirm('Deseja realmente excluir este Cargo?')) {
-      await carregarCargos();
+  if (confirm('Deseja realmente excluir este Cargo?')) {
 
-      const existeBolsaAssociada = Cargos.value.some(c => c.CargoId === Id);
+    await carregarCargos();
 
-      if (existeBolsaAssociada) {
-      alert('Este Cargo não pode ser excluído porque está associado a uma ou mais bolsas.');
+    const cargoComBolsas = Cargos.value.find(c => c.Id === Id && c.Bolsas && c.Bolsas.length > 0);
+
+    if (cargoComBolsas) {
+      snackbarError('Este Cargo não pode ser excluído porque está associado a uma ou mais bolsas');
       return;
-      }
+    }
 
-      await CargoController.delete(Id);
+    try {
+
+      await cargoController.delete(Id);
+      snackbarSuccess('Cargo excluído com sucesso!');
       await carregarCargos();
+    } catch (error) {
+      console.error('Erro ao excluir o cargo:', error);
+      snackbarError('Erro ao excluir o cargo.');
     }
   }
+};
+
 
   const cargoSelecionado = ref<ICargoResponse>(
-    new Cargo(0, '', '')
+    new Cargo(0, '', '', null)
   );
 
   const rules = {
