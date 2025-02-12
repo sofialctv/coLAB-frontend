@@ -1,7 +1,7 @@
 import FinanciadorRepository from '../models/Repositories/FinanciadorRepository';
 import type { IFinanciador } from '../models/Entities/Financiador';
 
-export default class PessoaService {
+export default class FinanciadorService {
   private financiadorRepository: FinanciadorRepository;
 
   constructor() {
@@ -9,7 +9,7 @@ export default class PessoaService {
   }
 
   async getAll(): Promise<IFinanciador[]> {
-    return await this.financiadorRepository.fetchFinanciador_es();
+    return await this.financiadorRepository.fetchAllFinanciador();
   }
 
   async create(form: IFinanciador) {
@@ -20,7 +20,7 @@ export default class PessoaService {
   }
 
   async update(Id: number, form: IFinanciador) {
-    const financiadorExiste = await this.financiadorRepository.fetchFinanciador_es();
+    const financiadorExiste = await this.financiadorRepository.fetchAllFinanciador();
     if (!financiadorExiste.find(f => f.Id === Id)) {
       throw new Error("Financiador não encontrado.");
     }
