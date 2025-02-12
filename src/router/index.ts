@@ -12,6 +12,10 @@ export const router = createRouter({
       component: () => import('@/views/Bolsa.vue'),
     },
     {
+      path: '/cargo',
+      component: () => import('@/views/Cargo.vue'),
+    },
+    {
       path: '/financiador',
       component: () => import('@/views/Financiador.vue'),
     },

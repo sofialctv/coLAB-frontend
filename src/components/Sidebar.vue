@@ -18,6 +18,14 @@
       ></v-list-item>
 
       <v-list-item
+        prepend-icon="mdi-folder"
+        title="Cargos"
+        value="Cargos"
+        class="text-white"
+        to="/cargo"
+      ></v-list-item>
+
+      <v-list-item
         prepend-icon="mdi-cash-multiple"
         title="Financiadores"
         value="financiadores"
