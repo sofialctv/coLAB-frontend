@@ -1,25 +1,26 @@
 import type { IProjeto } from '../models/Entities/Projeto'
-import ProjetoRepository from '../models/Repositories/ProjetoRepository'
+import ProjetoService from '@/services/ProjetoService'
 
 export default class ProjetoController {
-  projetoRepository
+  private projetoService: ProjetoService
+
   constructor() {
-    this.projetoRepository = new ProjetoRepository()
+    this.projetoService = new ProjetoService()
   }
 
   async getAll() {
-    return await this.projetoRepository.fetchAllProjeto()
+    return await this.projetoService.getAllProjetos()
   }
 
   async create(form: IProjeto) {
-    return await this.projetoRepository.createProjeto(form)
+    return await this.projetoService.createProjeto(form)
   }
 
   async update(id: number, form: IProjeto) {
-    return await this.projetoRepository.updateProjeto(id, form)
+    return await this.projetoService.updateProjeto(id, form)
   }
 
   async delete(id: number) {
-    return await this.projetoRepository.deleteProjeto(id)
+    return await this.projetoService.deleteProjeto(id)
   }
 }

@@ -5,7 +5,6 @@ import type { IProjeto } from '../models/Entities/Projeto'
 import { Projeto } from '../models/Entities/Projeto'
 import FinanciadorController from '../controllers/FinanciadorController'
 import type { IFinanciador} from '../models/Entities/Financiador'
-import { Financiador } from '../models/Entities/Financiador'
 import GenericSnackbar from '../components/GenericSnackbar.vue';
 import { ProjetoStatus } from '../models/Entities/Enums/ProjetoStatus'
 
@@ -29,7 +28,7 @@ const rules = {
   required: (v: any) => (v === null || v === undefined || v === '' ? "Campo obrigatório" : true),
 };
 
-// Definindo a lista de financiadores 
+// Definindo a lista de financiadores
 const financiadores = ref<IFinanciador[]>([])
 
 // Instância dos controllers
@@ -51,9 +50,7 @@ const carregarProjetos = async () => {
 // Carregar Financiadores
 const carregarFinanciadores = async () => {
   financiadores.value = await financiadorController.getAll();
-  console.log("Financiadores carregados:", financiadores.value);
 };
-
 
 // Verificando se a tela é menor que 1164px
 const adjustDatesContainer = ref(false)
@@ -65,7 +62,7 @@ const checkScreenSize = () => {
 onMounted(() => {
   carregarProjetos()
 
-  // Carregar financiadores 
+  // Carregar financiadores
   carregarFinanciadores()
 
   checkScreenSize()
@@ -139,6 +136,7 @@ const salvarProjeto = async () => {
 const excluirProjeto = async (id: number) => {
   if (confirm('Tem certeza que deseja excluir este projeto?')) {
     await projetoController.delete(id)
+    snackbarSuccess('Projeto excluído com sucesso!');
     await carregarProjetos()
   }
 }
