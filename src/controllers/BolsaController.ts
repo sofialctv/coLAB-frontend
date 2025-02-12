@@ -1,25 +1,26 @@
-import type { IBolsa, IBolsaRequest } from '../models/Entities/Bolsa'
-import BolsaRepository from '../models/Repositories/BolsaRepository'
+import type { IBolsaRequest } from '../models/Entities/Bolsa';
+import BolsaService from '../services/BolsaService';
 
 export default class BolsaController {
-  bolsaRepository
+  private bolsaService: BolsaService;
+
   constructor() {
-    this.bolsaRepository = new BolsaRepository()
+    this.bolsaService = new BolsaService();
   }
 
   async getAll() {
-    return await this.bolsaRepository.fetchAllBolsa()
+    return await this.bolsaService.getAllBolsa();
   }
 
   async create(form: IBolsaRequest) {
-    return await this.bolsaRepository.createBolsa(form)
+    return await this.bolsaService.createBolsa(form);
   }
 
   async update(id: number, form: IBolsaRequest) {
-    return await this.bolsaRepository.updateBolsa(id, form)
+    return await this.bolsaService.updateBolsa(id, form);
   }
 
   async delete(id: number) {
-    return await this.bolsaRepository.deleteBolsa(id)
+    return await this.bolsaService.deleteBolsa(id);
   }
 }

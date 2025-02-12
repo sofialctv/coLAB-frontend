@@ -57,7 +57,7 @@ const bolsaSelecionada = ref<IBolsa>(
     "",                  // PlanoTrabalho
     0,                   // Valor
     new Date(),          // DataInicio
-    new Date(),          // DataFim
+    null,          // DataFim
     new Date(),          // DataPrevistaFim
     true,                // Ativo
     null,                // PessoaId
@@ -129,7 +129,7 @@ const abrirNovaBolsa = () => {
     "",                  // PlanoTrabalho
     0,                   // Valor
     new Date(),          // DataInicio
-    new Date(),          // DataFim
+    null,          // DataFim
     new Date(),          // DataPrevistaFim
     true,                // Ativo
     null,                // PessoaId
