@@ -62,6 +62,31 @@
     }
   }
 
+  const SalvarFinanciador = async () => {
+  try {
+    // Converte para formato ISO 8601
+    const financiadorParaSalvar = {
+      ...financiadorSelecionado.value,
+    };
+
+    // Verifica se é edição ou criação
+    if (financiadorSelecionado.value.Id) {
+      await financiadorController.update(financiadorSelecionado.value.Id, financiadorParaSalvar);
+      snackbarSuccess('Financiador atualizado com sucesso!');
+    } 
+    else {
+      await financiadorController.create(financiadorParaSalvar);
+      snackbarSuccess('Financiador criado com sucesso!');
+    }
+
+    dialog.value = false;
+    await carregarFinanciadores();
+  } catch (error) {
+    console.error("Erro ao salvar financiador:", error);
+    snackbarError('Erro ao salvar financiador.');
+  }
+};
+
   const editarFinanciador = (financiador: IFinanciador) => {
     financiadorSelecionado.value = { ...financiador };
     dialog.value = true;
@@ -175,7 +200,7 @@
 
       <v-card-actions>
           <v-btn color="red" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="green" @click="criarFinanciador">Salvar</v-btn>
+          <v-btn color="green" @click="SalvarFinanciador">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
