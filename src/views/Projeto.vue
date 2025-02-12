@@ -156,6 +156,7 @@ const excluirProjeto = async (id: number) => {
         { title: 'Nome', key: 'nome' },
         { title: 'Descrição', key: 'descricao' },
         { title: 'Orçamento', key: 'orcamento' },
+        { title: 'Status', key: 'statusDescricao' },
         { title: 'Ações', key: 'acoes', sortable: false }
       ]" :items="projetos" class="elevation-1">
         <template v-slot:item="{ item }">
@@ -163,6 +164,7 @@ const excluirProjeto = async (id: number) => {
             <td>{{ item.nome }}</td>
             <td>{{ item.descricao }}</td>
             <td>{{ item.orcamento }}</td>
+            <td>{{ item.statusNome }}</td>
             <td style="display: flex; gap: 0.5rem; align-items: center;">
               <v-btn icon color="blue" size="small" @click="editarProjeto(item)">
                 <v-icon>mdi-pencil</v-icon>

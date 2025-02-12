@@ -2,6 +2,7 @@ import api from '@/api/api'
 import type { IProjeto } from '../Entities/Projeto'
 import { Projeto } from '../Entities/Projeto'
 import ProjetoRoutes from '../ApiRoutes/ProjetoRoutes'
+import type { IHistoricoStatus } from '../Entities/HistoricoStatus'
 
 export default class ProjetoRepository {
   apiClient
@@ -28,7 +29,7 @@ export default class ProjetoRepository {
       // Retorna a função com a criação de objetos
       return response.data.$values.map((projeto: IProjeto) => {
         // Verificar o histórico de status e pegar o último status válido
-        const ultimoStatus = projeto
+        const ultimoStatus: IHistoricoStatus[] = projeto
           .historicoStatus!.$values!.filter((status: any) => !status.dataFim) // apenas o status sem dataFim
           .sort(
             (a: any, b: any) => new Date(b.dataInicio).getTime() - new Date(a.dataInicio).getTime(),
@@ -36,6 +37,7 @@ export default class ProjetoRepository {
 
         // definindo o status como o valor do último item no histórico
         const statusAtual = ultimoStatus[0].status
+        const statusAtualDesc = ultimoStatus[0].statusDescricao
 
         return new Projeto(
           projeto.id,
@@ -50,6 +52,7 @@ export default class ProjetoRepository {
           statusAtual, // status mais atual do projeto
           projeto.bolsa,
           projeto.historicoStatus,
+          statusAtualDesc,
         )
       })
     } catch (error) {
